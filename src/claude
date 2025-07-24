@@ -4,12 +4,14 @@
 # Checks for @anthropic-ai/claude-code package and installs if needed.
 # Acts as transparent proxy to the actual claude command.
 
-echo "Initializing claude command..."
-
-# Helper function to check Node.js version.
 _check_nodejs_version() {
     if ! command -v node >/dev/null 2>&1; then
         echo "Error: Node.js is not installed. Please install Node.js version 18 or higher." >&2
+        return 1
+    fi
+    
+    if ! command -v npm >/dev/null 2>&1; then
+        echo "Error: npm is not available. Please ensure npm is installed and in your PATH." >&2
         return 1
     fi
     
@@ -32,14 +34,14 @@ _check_nodejs_version() {
     return 0
 }
 
-# Helper function to check if npm package is installed globally.
 _claude_is_installed() {
-    npm list -g @anthropic-ai/claude-code >/dev/null 2>&1
+    local claude_pkg="$1"
+    npm list -g "$claude_pkg" >/dev/null 2>&1
 }
 
-# Helper function to prompt user for installation.
 _claude_prompt_install() {
-    echo "The @anthropic-ai/claude-code npm package is not installed."
+    local claude_pkg="$1"
+    echo "The $claude_pkg npm package is not installed."
     echo -n "Would you like to install it globally? (y/N): "
     read -r response
     case "$response" in
@@ -52,28 +54,29 @@ _claude_prompt_install() {
     esac
 }
 
-# Helper function to install the package.
 _claude_install_package() {
-    echo "Installing @anthropic-ai/claude-code globally..."
-    if npm install -g @anthropic-ai/claude-code; then
-        echo "Successfully installed @anthropic-ai/claude-code"
+    local claude_pkg="$1"
+    echo "Installing $claude_pkg globally..."
+    if npm install -g "$claude_pkg"; then
+        echo "Successfully installed $claude_pkg"
         return 0
     else
-        echo "Failed to install @anthropic-ai/claude-code" >&2
+        echo "Failed to install $claude_pkg" >&2
         return 1
     fi
 }
 
 # Main claude function - this gets redefined to be the actual function.
 claude() {
-    # First check if Node.js version is adequate
+    local claude_pkg="@anthropic-ai/claude-code"
+    
     if ! _check_nodejs_version; then
         return 1
     fi
     
-    if ! _claude_is_installed; then
-        if _claude_prompt_install; then
-            if ! _claude_install_package; then
+    if ! _claude_is_installed "$claude_pkg"; then
+        if _claude_prompt_install "$claude_pkg"; then
+            if ! _claude_install_package "$claude_pkg"; then
                 echo "Installation failed. Exiting." >&2
                 return 1
             fi
@@ -83,8 +86,12 @@ claude() {
         fi
     fi
 
-    # Run the actual claude command with all passed arguments.
-    command claude "$@"
+    # Run the actual claude command with all passed arguments and handle errors
+    if ! command claude "$@"; then
+        local exit_code=$?
+        echo "Error: Claude command failed with exit code $exit_code" >&2
+        return $exit_code
+    fi
 }
 
 # Run the function with the current arguments.

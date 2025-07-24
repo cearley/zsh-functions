@@ -84,25 +84,25 @@ teardown() {
 
 @test "claude_is_installed returns true when installed" {
     mock_claude_installed
-    run _claude_is_installed
+    run _claude_is_installed "@anthropic-ai/claude-code"
     [ "$status" -eq 0 ]
 }
 
 @test "claude_is_installed returns false when not installed" {
     mock_claude_not_installed
-    run _claude_is_installed
+    run _claude_is_installed "@anthropic-ai/claude-code"
     [ "$status" -eq 1 ]
 }
 
 @test "claude_install_package succeeds with successful npm install" {
     mock_claude_install_success
-    run _claude_install_package
+    run _claude_install_package "@anthropic-ai/claude-code"
     [ "$status" -eq 0 ]
 }
 
 @test "claude_install_package fails with npm error" {
     mock_claude_install_failure
-    run _claude_install_package
+    run _claude_install_package "@anthropic-ai/claude-code"
     [ "$status" -eq 1 ]
     [[ "$output" == *"Failed to install @anthropic-ai/claude-code"* ]]
 }
