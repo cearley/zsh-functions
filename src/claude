@@ -1,0 +1,91 @@
+#!/usr/bin/env zsh
+
+# Claude command proxy function.
+# Checks for @anthropic-ai/claude-code package and installs if needed.
+# Acts as transparent proxy to the actual claude command.
+
+echo "Initializing claude command..."
+
+# Helper function to check Node.js version.
+_check_nodejs_version() {
+    if ! command -v node >/dev/null 2>&1; then
+        echo "Error: Node.js is not installed. Please install Node.js version 18 or higher." >&2
+        return 1
+    fi
+    
+    local node_version
+    node_version=$(node --version 2>/dev/null | sed 's/^v//')
+    
+    if [[ -z "$node_version" ]]; then
+        echo "Error: Could not determine Node.js version." >&2
+        return 1
+    fi
+    
+    local major_version
+    major_version=$(echo "$node_version" | cut -d. -f1)
+    
+    if [[ "$major_version" -lt 18 ]]; then
+        echo "Error: Node.js version $node_version is too old. Please install Node.js version 18 or higher." >&2
+        return 1
+    fi
+    
+    return 0
+}
+
+# Helper function to check if npm package is installed globally.
+_claude_is_installed() {
+    npm list -g @anthropic-ai/claude-code >/dev/null 2>&1
+}
+
+# Helper function to prompt user for installation.
+_claude_prompt_install() {
+    echo "The @anthropic-ai/claude-code npm package is not installed."
+    echo -n "Would you like to install it globally? (y/N): "
+    read -r response
+    case "$response" in
+        [yY]|[yY][eE][sS])
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+# Helper function to install the package.
+_claude_install_package() {
+    echo "Installing @anthropic-ai/claude-code globally..."
+    if npm install -g @anthropic-ai/claude-code; then
+        echo "Successfully installed @anthropic-ai/claude-code"
+        return 0
+    else
+        echo "Failed to install @anthropic-ai/claude-code" >&2
+        return 1
+    fi
+}
+
+# Main claude function - this gets redefined to be the actual function.
+claude() {
+    # First check if Node.js version is adequate
+    if ! _check_nodejs_version; then
+        return 1
+    fi
+    
+    if ! _claude_is_installed; then
+        if _claude_prompt_install; then
+            if ! _claude_install_package; then
+                echo "Installation failed. Exiting." >&2
+                return 1
+            fi
+        else
+            echo "Installation declined. Exiting."
+            return 0
+        fi
+    fi
+
+    # Run the actual claude command with all passed arguments.
+    command claude "$@"
+}
+
+# Run the function with the current arguments.
+claude "$@"
