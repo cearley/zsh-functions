@@ -17,6 +17,20 @@ Transparent proxy to the `@anthropic-ai/claude-code` npm package. Automatically 
 claude "Write a hello world function"
 ```
 
+### `gemini`
+Transparent proxy to the `@google/gemini-cli` npm package. Automatically handles installation and setup.
+
+**Features:**
+- Checks for Node.js (≥20) and npm
+- Prompts to install package if missing
+- Passes all arguments to the actual gemini command
+
+**Usage:**
+```bash
+gemini "Explain the architecture of this codebase"
+gemini -m gemini-2.5-flash "Generate tests for this function"
+```
+
 ### `brew-list-formulas`
 Lists formulas from Homebrew taps.
 
@@ -121,6 +135,7 @@ Available tasks (Cmd+Shift+P → "Tasks: Run Task"):
 ```
 ├── src/                    # Function source files
 │   ├── claude             # Claude AI proxy
+│   ├── gemini             # Gemini AI proxy
 │   ├── brew-list-formulas # Homebrew utility
 │   └── hello              # Demo function
 ├── tests/                 # Test suite
@@ -137,6 +152,7 @@ Available tasks (Cmd+Shift+P → "Tasks: Run Task"):
 - **Zsh shell**
 - **Bats** (for testing): `brew install bats-core`
 - **Node.js ≥18** (for claude function)
+- **Node.js ≥20** (for gemini function)
 
 ## License
 
