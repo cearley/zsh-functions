@@ -1,12 +1,12 @@
 # Zsh Functions Collection
 
-[![CI](https://github.com/craig/zsh_functions/actions/workflows/ci.yml/badge.svg)](https://github.com/craig/zsh_functions/actions/workflows/ci.yml)
+[![CI](https://github.com/cearley/zsh_functions/actions/workflows/ci.yml/badge.svg)](https://github.com/cearley/zsh_functions/actions)
 ![Shell](https://img.shields.io/badge/shell-zsh-blue.svg)
 ![macOS](https://img.shields.io/badge/macOS-supported-blue.svg)
 ![Node.js](https://img.shields.io/badge/node.js-18%2B-green.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)
-![GitHub last commit](https://img.shields.io/github/last-commit/craig/zsh_functions)
+[![GitHub last commit](https://img.shields.io/github/last-commit/cearley/zsh_functions)](https://github.com/cearley/zsh_functions/commits)
 
 A collection of useful zsh shell functions with comprehensive testing.
 
