@@ -1,0 +1,135 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Development Commands
+
+**Testing:**
+- `bats tests/unit/ tests/integration/` - Run full test suite (32 tests total)
+- `bats tests/unit/` - Run unit tests only
+- `bats tests/integration/` - Run integration tests only
+- `act` - Test GitHub Actions CI workflow locally (requires Docker)
+
+**Development workflow:**
+- `./sync.zsh` - Copy functions to user's zsh directory (`~/.zsh_functions` by default)
+- `shellcheck src/*` - Validate shell scripts
+- `chmod +x src/*` - Make functions executable
+
+**VS Code tasks available:**
+- "Run All Tests (Bats)" - Execute full test suite
+- "Sync to ~/.zfunc" - Deploy functions to zsh directory
+- "Validate Shell Scripts" - Run shellcheck on all functions
+
+## Architecture
+
+This is a zsh functions collection with a modular, autoloadable design. Each function in `src/` is self-contained and follows zsh autoloading conventions.
+
+**Core Structure:**
+- `src/` - Function source files (currently: claude, gemini, brew-list-formulas, hello)
+- `tests/` - Comprehensive Bats-based test suite with unit and integration tests
+- `sync.zsh` - Development deployment script
+- `.env` - Configuration for sync destination directory
+- `.github/workflows/ci.yml` - GitHub Actions CI/CD pipeline
+
+**Function Architecture Pattern:**
+Each function follows this structure:
+```bash
+#!/usr/bin/env zsh
+
+# Helper functions with _ prefix
+_private_helper() { ... }
+
+# Main function
+function_name() {
+    # Implementation with proper error handling
+    # Uses local variables and proper quoting
+}
+
+# Auto-execute when called directly
+function_name "$@"
+```
+
+**Key Design Principles:**
+- Functions are autoloadable and self-contained
+- Comprehensive error handling with proper exit codes
+- Interactive prompts for user confirmation (e.g., package installation)
+- Dependency validation before execution
+- Security-conscious scripting practices
+
+**Development Environment:**
+- Uses `.env` for configuration (ZFUNC_SYNC_DIR)
+- Supports both manual testing and automated Bats testing
+- VS Code integration with predefined tasks
+- Functions deployed to `~/.zsh_functions` and added to zsh's `fpath`
+- GitHub Actions CI/CD for automated testing and validation
+
+## Dependencies
+
+**System Requirements:**
+- Zsh shell (primary requirement)
+- Bats testing framework for development (`brew install bats-core`)
+
+**Function-specific dependencies:**
+- `claude`: Node.js ≥18, npm (auto-managed by the function)
+- `gemini`: Node.js ≥20, npm (auto-managed by the function)
+- `brew-list-formulas`: jq, Homebrew
+
+## Installation Process
+
+Functions are installed by copying to `~/.zsh_functions/` and enabling zsh autoloading:
+1. `fpath=(~/.zsh_functions $fpath)` in `~/.zshrc`
+2. `autoload -Uz ~/.zsh_functions/*` in `~/.zshrc`
+3. Functions become available as shell commands
+
+## Code Style Guidelines
+
+- Follow zsh scripting best practices with proper error handling (`set -e`)
+- Use `local` for variable scoping
+- Implement comprehensive input validation
+- Include user-friendly error messages to stderr
+- Use descriptive variable names and consistent formatting
+- Test functions thoroughly with both unit and integration tests
+
+## Continuous Integration
+
+The repository includes a GitHub Actions CI workflow (`.github/workflows/ci.yml`) that automatically:
+
+**CI Pipeline Steps:**
+1. **Environment Setup**: Uses Ubuntu 22.04 container with zsh, jq, shellcheck, git, curl
+2. **Node.js Installation**: Installs Node.js 20.x for function dependencies
+3. **Bats Installation**: Installs Bats testing framework from source
+4. **Static Analysis**: Runs shellcheck on all source functions
+5. **Sync Testing**: Validates the sync.zsh script functionality
+6. **Test Execution**: Runs the complete Bats test suite
+
+**Local CI Testing with act:**
+You can test the GitHub Actions workflow locally using [act](https://nektosact.com/):
+
+```bash
+# Install act (macOS with Homebrew)
+brew install act
+
+# Run the CI workflow locally
+act
+
+# Run specific job
+act -j test
+
+# Use medium runner for more resources
+act -P ubuntu-latest=catthehacker/ubuntu:act-22.04
+```
+
+**act Benefits:**
+- **Fast Feedback**: Test workflow changes without pushing to GitHub
+- **Local Development**: Catch CI issues before committing
+- **Resource Efficient**: Uses Docker containers to simulate GitHub's environment
+
+**act Requirements:**
+- Docker installed and running
+- Sufficient disk space for Ubuntu container images
+- Network access for downloading dependencies
+
+**Important Notes:**
+- Some integration tests are conditionally skipped in CI environments where Node.js is installed system-wide
+- The CI uses Ubuntu 22.04 container for consistent, clean testing environment
+- All 32 tests should pass for successful CI completion

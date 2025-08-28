@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: ubuntu:22.04
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install dependencies
+      run: |
+        apt-get update
+        apt-get install -y zsh jq shellcheck git curl
+        
+    - name: Install Node.js
+      run: |
+        curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+        apt-get install -y nodejs
+        
+    - name: Install Bats
+      run: |
+        git clone https://github.com/bats-core/bats-core.git
+        cd bats-core
+        ./install.sh /usr/local
+        
+    - name: Make functions executable
+      run: chmod +x src/*
+      
+    - name: Run shellcheck
+      run: shellcheck -s bash src/*
+        
+    - name: Test sync script
+      run: |
+        # Test sync script functionality
+        mkdir -p test_sync_target
+        ZFUNC_SYNC_DIR=./test_sync_target ./sync.zsh
+        
+        # Verify files were synced (excluding hello)
+        [ -f test_sync_target/claude ]
+        [ -f test_sync_target/gemini ]
+        [ ! -f test_sync_target/hello ]
+        
+        echo "✓ Sync script test passed"
+        
+    - name: Run tests
+      run: bats tests/unit/ tests/integration/
