@@ -4,7 +4,7 @@
 # Checks for @anthropic-ai/claude-code package and installs if needed.
 # Acts as transparent proxy to the actual claude command.
 
-_check_nodejs_version() {
+_claude_check_nodejs_version() {
     if ! command -v node >/dev/null 2>&1; then
         echo "Error: Node.js is not installed. Please install Node.js version 18 or higher." >&2
         return 1
@@ -70,7 +70,7 @@ _claude_install_package() {
 claude() {
     local claude_pkg="@anthropic-ai/claude-code"
     
-    if ! _check_nodejs_version; then
+    if ! _claude_check_nodejs_version; then
         return 1
     fi
     

@@ -6,7 +6,7 @@ setup() {
     # Load the claude script functions for testing
     load_claude_functions() {
         # Extract and define helper functions from claude script
-        eval "$(sed -n '/^_check_nodejs_version() {/,/^}/p' "$BATS_TEST_DIRNAME/../../src/claude")"
+        eval "$(sed -n '/^_claude_check_nodejs_version() {/,/^}/p' "$BATS_TEST_DIRNAME/../../src/claude")"
         eval "$(sed -n '/^_claude_is_installed() {/,/^}/p' "$BATS_TEST_DIRNAME/../../src/claude")"
         eval "$(sed -n '/^_claude_prompt_install() {/,/^}/p' "$BATS_TEST_DIRNAME/../../src/claude")"
         eval "$(sed -n '/^_claude_install_package() {/,/^}/p' "$BATS_TEST_DIRNAME/../../src/claude")"
@@ -72,13 +72,13 @@ teardown() {
 
 @test "check_nodejs_version succeeds with Node.js installed" {
     mock_nodejs_success
-    run _check_nodejs_version
+    run _claude_check_nodejs_version
     [ "$status" -eq 0 ]
 }
 
 @test "check_nodejs_version fails without Node.js" {
     mock_nodejs_failure
-    run _check_nodejs_version
+    run _claude_check_nodejs_version
     [ "$status" -eq 1 ]
 }
 

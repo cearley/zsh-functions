@@ -6,7 +6,7 @@ setup() {
     # Load the gemini script functions for testing
     load_gemini_functions() {
         # Extract and define helper functions from gemini script
-        eval "$(sed -n '/^_check_nodejs_version() {/,/^}/p' "$BATS_TEST_DIRNAME/../../src/gemini")"
+        eval "$(sed -n '/^_gemini_check_nodejs_version() {/,/^}/p' "$BATS_TEST_DIRNAME/../../src/gemini")"
         eval "$(sed -n '/^_gemini_is_installed() {/,/^}/p' "$BATS_TEST_DIRNAME/../../src/gemini")"
         eval "$(sed -n '/^_gemini_prompt_install() {/,/^}/p' "$BATS_TEST_DIRNAME/../../src/gemini")"
         eval "$(sed -n '/^_gemini_install_package() {/,/^}/p' "$BATS_TEST_DIRNAME/../../src/gemini")"
@@ -87,20 +87,20 @@ teardown() {
 
 @test "check_nodejs_version succeeds with Node.js 20+" {
     mock_nodejs_success
-    run _check_nodejs_version
+    run _gemini_check_nodejs_version
     [ "$status" -eq 0 ]
 }
 
 @test "check_nodejs_version fails without Node.js" {
     mock_nodejs_failure
-    run _check_nodejs_version
+    run _gemini_check_nodejs_version
     [ "$status" -eq 1 ]
     [[ "$output" == *"Node.js is not installed"* ]]
 }
 
 @test "check_nodejs_version fails with old Node.js version" {
     mock_nodejs_old_version
-    run _check_nodejs_version
+    run _gemini_check_nodejs_version
     [ "$status" -eq 1 ]
     [[ "$output" == *"version 18.0.0 is too old"* ]]
     [[ "$output" == *"Node.js version 20 or higher"* ]]

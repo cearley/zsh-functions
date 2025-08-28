@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-# Let's again assume that these are the contents of a file called "hello".
+# Simple greeting function demonstrating zsh function structure.
 
 # You may run arbitrary code in here, that will run the first time the
 # function is referenced. Commonly, that is initialisation code. For example

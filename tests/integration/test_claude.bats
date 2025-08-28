@@ -157,7 +157,7 @@ EOF
 }
 
 @test "claude script contains required helper functions" {
-    grep -q "_check_nodejs_version" "$CLAUDE_SCRIPT"
+    grep -q "_claude_check_nodejs_version" "$CLAUDE_SCRIPT"
     grep -q "_claude_is_installed" "$CLAUDE_SCRIPT"
     grep -q "_claude_install_package" "$CLAUDE_SCRIPT"
     grep -q "_claude_prompt_install" "$CLAUDE_SCRIPT"

@@ -4,7 +4,7 @@
 # Checks for @google/gemini-cli package and installs if needed.
 # Acts as transparent proxy to the actual gemini command.
 
-_check_nodejs_version() {
+_gemini_check_nodejs_version() {
     if ! command -v node >/dev/null 2>&1; then
         echo "Error: Node.js is not installed. Please install Node.js version 20 or higher." >&2
         return 1
@@ -70,7 +70,7 @@ _gemini_install_package() {
 gemini() {
     local gemini_pkg="@google/gemini-cli"
     
-    if ! _check_nodejs_version; then
+    if ! _gemini_check_nodejs_version; then
         return 1
     fi
     

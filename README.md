@@ -4,6 +4,8 @@ A collection of useful zsh shell functions with comprehensive testing.
 
 ## Functions
 
+See [Note on claude and gemini functions](#note-on-claude-and-gemini-functions)
+
 ### `claude`
 Transparent proxy to the `@anthropic-ai/claude-code` npm package. Automatically handles installation and setup.
 
@@ -31,6 +33,21 @@ gemini "Explain the architecture of this codebase"
 gemini -m gemini-2.5-flash "Generate tests for this function"
 ```
 
+### Note on claude and gemini functions
+These functions are called 'transparent proxies' because they automatically check for and install the required npm packages (like `@anthropic-ai/claude-code` or `@google/gemini-cli`) the first time you use them. This is especially helpful for developers who use multiple Node.js environments (for example, with nvm or asdf), where global npm packages might not always be available in every environment.
+
+**Advantages:**
+- You don't have to manually install or update the CLI tools—they are installed for you if missing.
+- You always get a working command, even if you switch Node.js versions or environments.
+- The proxy functions work just like the real CLI tools, so you can use them the same way.
+
+**Possible disadvantages:**
+- The first run may be slower if the package needs to be installed.
+- If you use many different Node.js environments, the package may be installed multiple times (once per environment).
+- Automatic installation may not be desirable in some locked-down or production environments.
+
+For most developers, this approach makes it much more convenient to use these tools without worrying about setup or environment issues.
+
 ### `brew-list-formulas`
 Lists formulas from Homebrew taps.
 
@@ -46,47 +63,29 @@ brew-list-formulas homebrew/core
 brew-list-formulas tap1/name tap2/name
 ```
 
-### `hello`
-Simple greeting function demonstrating zsh function structure.
-
-**Usage:**
-```bash
-hello
-# Output: Hello world.
-```
-
 ## Installation
 
 1. **Copy functions to your zsh directory:**
+   Use the included sync script:
    ```bash
-   mkdir -p ~/.zfunc
-   cp src/* ~/.zfunc/
-   chmod +x ~/.zfunc/*
+   ZFUNC_SYNC_DIR={your_custom_directory} ./sync.zsh
+   # - or -
+   ./sync.zsh # ZFUNC_SYNC_DIR defaults to ~/.zsh_functions
    ```
 
 2. **Add to your `~/.zshrc`:**
    ```bash
-   # Add function directory to fpath
-   fpath=(~/.zfunc $fpath)
-   
-   # Auto-load all functions
-   autoload -Uz ~/.zfunc/*
+   # Add custom functions directory to fpath
+   fpath=( "$HOME/.zsh_functions" "${fpath[@]}" )
+   autoload -Uz $HOME/.zsh_functions/*
    ```
 
 3. **Reload your shell:**
-   ```bash
+   ```bash 
    source ~/.zshrc
    ```
 
-## Development
-
-### Quick Sync
-Use the included sync script:
-```bash
-./sync.zsh
-```
-
-### Testing
+### Development and Testing
 Tests use [Bats testing framework](https://github.com/bats-core/bats-core):
 
 ```bash

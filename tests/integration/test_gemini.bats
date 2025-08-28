@@ -168,7 +168,7 @@ EOF
 }
 
 @test "gemini script contains required helper functions" {
-    grep -q "_check_nodejs_version" "$GEMINI_SCRIPT"
+    grep -q "_gemini_check_nodejs_version" "$GEMINI_SCRIPT"
     grep -q "_gemini_is_installed" "$GEMINI_SCRIPT"
     grep -q "_gemini_install_package" "$GEMINI_SCRIPT"
     grep -q "_gemini_prompt_install" "$GEMINI_SCRIPT"
