@@ -35,3 +35,4 @@ test-results/
 # Shell history and temporary files
 .zsh_history
 .bash_history
+*.code-workspace

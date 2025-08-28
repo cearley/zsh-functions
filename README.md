@@ -2,7 +2,6 @@
 
 [![CI](https://github.com/cearley/zsh_functions/actions/workflows/ci.yml/badge.svg)](https://github.com/cearley/zsh_functions/actions)
 ![Shell](https://img.shields.io/badge/shell-zsh-blue.svg)
-![macOS](https://img.shields.io/badge/macOS-supported-blue.svg)
 ![Node.js](https://img.shields.io/badge/node.js-18%2B-green.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)
