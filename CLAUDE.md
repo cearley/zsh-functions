@@ -11,24 +11,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `act` - Test GitHub Actions CI workflow locally (requires Docker)
 
 **Development workflow:**
-- `./sync.zsh` - Copy functions to user's zsh directory (`~/.zsh_functions` by default)
-- `shellcheck src/*` - Validate shell scripts
-- `chmod +x src/*` - Make functions executable
+- `shellcheck autoload/*` - Validate shell scripts
+- `chmod +x autoload/*` - Make functions executable
+- Test with `bats tests/unit/ tests/integration/`
 
 **VS Code tasks available:**
 - "Run All Tests (Bats)" - Execute full test suite
-- "Sync to ~/.zfunc" - Deploy functions to zsh directory
 - "Validate Shell Scripts" - Run shellcheck on all functions
 
 ## Architecture
 
-This is a zsh functions collection with a modular, autoloadable design. Each function in `src/` is self-contained and follows zsh autoloading conventions.
+This is a zsh functions collection with a modular, autoloadable design. Each function in `autoload/` is self-contained and follows zsh autoloading conventions.
 
 **Core Structure:**
-- `src/` - Function source files (currently: claude, gemini, brew-list-formulas, hello)
+- `autoload/` - Autoloadable zsh function files (claude, gemini, brew-list-formulas, hello)
 - `tests/` - Comprehensive Bats-based test suite with unit and integration tests
-- `sync.zsh` - Development deployment script
-- `.env` - Configuration for sync destination directory
 - `.github/workflows/ci.yml` - GitHub Actions CI/CD pipeline
 
 **Function Architecture Pattern:**
@@ -57,10 +54,9 @@ function_name "$@"
 - Security-conscious scripting practices
 
 **Development Environment:**
-- Uses `.env` for configuration (ZFUNC_SYNC_DIR)
 - Supports both manual testing and automated Bats testing
 - VS Code integration with predefined tasks
-- Functions deployed to `~/.zsh_functions` and added to zsh's `fpath`
+- Functions used directly from cloned repository via zsh's `fpath`
 - GitHub Actions CI/CD for automated testing and validation
 
 ## Dependencies
@@ -76,10 +72,11 @@ function_name "$@"
 
 ## Installation Process
 
-Functions are installed by copying to `~/.zsh_functions/` and enabling zsh autoloading:
-1. `fpath=(~/.zsh_functions $fpath)` in `~/.zshrc`
-2. `autoload -Uz ~/.zsh_functions/*` in `~/.zshrc`
-3. Functions become available as shell commands
+Functions are used directly from the cloned repository:
+1. Clone: `git clone https://github.com/cearley/zsh-functions.git ~/.zsh-functions`
+2. Add to `~/.zshrc`: `fpath=("$HOME/.zsh-functions/autoload" $fpath)`
+3. Add to `~/.zshrc`: `autoload -Uz $HOME/.zsh-functions/autoload/*`
+4. Functions become available as shell commands
 
 ## Code Style Guidelines
 
@@ -99,7 +96,7 @@ The repository includes a GitHub Actions CI workflow (`.github/workflows/ci.yml`
 2. **Node.js Installation**: Installs Node.js 20.x for function dependencies
 3. **Bats Installation**: Installs Bats testing framework from source
 4. **Static Analysis**: Runs shellcheck on all source functions
-5. **Sync Testing**: Validates the sync.zsh script functionality
+5. **Functions Testing**: Validates that function files exist and are executable
 6. **Test Execution**: Runs the complete Bats test suite
 
 **Local CI Testing with act:**

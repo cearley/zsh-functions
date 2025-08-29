@@ -10,7 +10,7 @@ setup() {
     export PATH="$TEST_DIR:$PATH"
     
     # Path to claude script
-    export CLAUDE_SCRIPT="$BATS_TEST_DIRNAME/../../src/claude"
+    export CLAUDE_SCRIPT="$BATS_TEST_DIRNAME/../../autoload/claude"
 }
 
 teardown() {

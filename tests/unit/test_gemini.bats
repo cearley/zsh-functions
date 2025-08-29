@@ -6,10 +6,10 @@ setup() {
     # Load the gemini script functions for testing
     load_gemini_functions() {
         # Extract and define helper functions from gemini script
-        eval "$(sed -n '/^_gemini_check_nodejs_version() {/,/^}/p' "$BATS_TEST_DIRNAME/../../src/gemini")"
-        eval "$(sed -n '/^_gemini_is_installed() {/,/^}/p' "$BATS_TEST_DIRNAME/../../src/gemini")"
-        eval "$(sed -n '/^_gemini_prompt_install() {/,/^}/p' "$BATS_TEST_DIRNAME/../../src/gemini")"
-        eval "$(sed -n '/^_gemini_install_package() {/,/^}/p' "$BATS_TEST_DIRNAME/../../src/gemini")"
+        eval "$(sed -n '/^_gemini_check_nodejs_version() {/,/^}/p' "$BATS_TEST_DIRNAME/../../autoload/gemini")"
+        eval "$(sed -n '/^_gemini_is_installed() {/,/^}/p' "$BATS_TEST_DIRNAME/../../autoload/gemini")"
+        eval "$(sed -n '/^_gemini_prompt_install() {/,/^}/p' "$BATS_TEST_DIRNAME/../../autoload/gemini")"
+        eval "$(sed -n '/^_gemini_install_package() {/,/^}/p' "$BATS_TEST_DIRNAME/../../autoload/gemini")"
     }
     
     # Mock functions for testing

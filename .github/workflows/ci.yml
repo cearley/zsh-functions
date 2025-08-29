@@ -31,23 +31,20 @@ jobs:
         ./install.sh /usr/local
         
     - name: Make functions executable
-      run: chmod +x src/*
+      run: chmod +x autoload/*
       
     - name: Run shellcheck
-      run: shellcheck -s bash src/*
+      run: shellcheck -s bash autoload/*
         
-    - name: Test sync script
+    - name: Test autoload directory
       run: |
-        # Test sync script functionality
-        mkdir -p test_sync_target
-        ZFUNC_SYNC_DIR=./test_sync_target ./sync.zsh
+        # Verify function files exist and are executable
+        [ -f autoload/claude ] && [ -x autoload/claude ]
+        [ -f autoload/gemini ] && [ -x autoload/gemini ]
+        [ -f autoload/brew-list-formulas ] && [ -x autoload/brew-list-formulas ]
+        [ -f autoload/hello ] && [ -x autoload/hello ]
         
-        # Verify files were synced (excluding hello)
-        [ -f test_sync_target/claude ]
-        [ -f test_sync_target/gemini ]
-        [ ! -f test_sync_target/hello ]
-        
-        echo "✓ Sync script test passed"
+        echo "✓ Autoload directory test passed"
         
     - name: Run tests
       run: bats tests/unit/ tests/integration/

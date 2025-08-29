@@ -10,7 +10,7 @@ setup() {
     export PATH="$TEST_DIR:$PATH"
     
     # Path to gemini script
-    export GEMINI_SCRIPT="$BATS_TEST_DIRNAME/../../src/gemini"
+    export GEMINI_SCRIPT="$BATS_TEST_DIRNAME/../../autoload/gemini"
 }
 
 teardown() {
