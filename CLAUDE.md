@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 **Testing:**
-- `bats tests/unit/ tests/integration/` - Run full test suite (32 tests total)
+- `bats tests/unit/ tests/integration/` - Run full test suite (57 tests total)
 - `bats tests/unit/` - Run unit tests only
 - `bats tests/integration/` - Run integration tests only
 - `act` - Test GitHub Actions CI workflow locally (requires Docker)
@@ -24,7 +24,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a zsh functions collection with a modular, autoloadable design. Each function in `autoload/` is self-contained and follows zsh autoloading conventions.
 
 **Core Structure:**
-- `autoload/` - Autoloadable zsh function files (claude, gemini, brew-list-formulas, hello)
+- `autoload/` - Autoloadable zsh function files (claude, codex, gemini, qwen, brew-list-formulas, hello)
 - `tests/` - Comprehensive Bats-based test suite with unit and integration tests
 - `.github/workflows/ci.yml` - GitHub Actions CI/CD pipeline
 
@@ -67,7 +67,9 @@ function_name "$@"
 
 **Function-specific dependencies:**
 - `claude`: Node.js ≥18, npm (auto-managed by the function)
+- `codex`: Node.js ≥20, npm (auto-managed by the function)
 - `gemini`: Node.js ≥20, npm (auto-managed by the function)
+- `qwen`: Node.js ≥20, npm (auto-managed by the function)
 - `brew-list-formulas`: jq, Homebrew
 
 ## Installation Process
@@ -129,4 +131,4 @@ act -P ubuntu-latest=catthehacker/ubuntu:act-22.04
 **Important Notes:**
 - Some integration tests are conditionally skipped in CI environments where Node.js is installed system-wide
 - The CI uses Ubuntu 22.04 container for consistent, clean testing environment
-- All 32 tests should pass for successful CI completion
+- All 57 tests should pass for successful CI completion
