@@ -87,8 +87,9 @@ gemini() {
     fi
 
     # Run the actual gemini command with all passed arguments and handle errors
-    if ! command gemini "$@"; then
-        local exit_code=$?
+    command gemini "$@"
+    local exit_code=$?
+    if [ $exit_code -ne 0 ]; then
         echo "Error: Gemini command failed with exit code $exit_code" >&2
         return $exit_code
     fi

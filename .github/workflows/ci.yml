@@ -41,9 +41,10 @@ jobs:
         # Verify function files exist and are executable
         [ -f autoload/claude ] && [ -x autoload/claude ]
         [ -f autoload/gemini ] && [ -x autoload/gemini ]
+        [ -f autoload/codex ] && [ -x autoload/codex ]
         [ -f autoload/brew-list-formulas ] && [ -x autoload/brew-list-formulas ]
         [ -f autoload/hello ] && [ -x autoload/hello ]
-        
+
         echo "✓ Autoload directory test passed"
         
     - name: Run tests

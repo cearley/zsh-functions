@@ -2,107 +2,74 @@
 
 # Unit tests for claude script helper functions
 
+load "../helpers.bash"
+
 setup() {
     # Load the claude script functions for testing
-    load_claude_functions() {
-        # Extract and define helper functions from claude script
-        eval "$(sed -n '/^_claude_check_nodejs_version() {/,/^}/p' "$BATS_TEST_DIRNAME/../../autoload/claude")"
-        eval "$(sed -n '/^_claude_is_installed() {/,/^}/p' "$BATS_TEST_DIRNAME/../../autoload/claude")"
-        eval "$(sed -n '/^_claude_prompt_install() {/,/^}/p' "$BATS_TEST_DIRNAME/../../autoload/claude")"
-        eval "$(sed -n '/^_claude_install_package() {/,/^}/p' "$BATS_TEST_DIRNAME/../../autoload/claude")"
-    }
-    
-    # Mock functions for testing
-    mock_nodejs_success() {
-        node() { echo "v18.0.0"; }
-        export -f node
-    }
-    
-    mock_nodejs_failure() {
-        node() { return 1; }
-        export -f node
-    }
-    
-    mock_claude_installed() {
-        npm() {
-            if [[ "$*" == "list -g @anthropic-ai/claude-code" ]]; then
-                echo "@anthropic-ai/claude-code@1.0.0"
-                return 0
-            fi
-        }
-        export -f npm
-    }
-    
-    mock_claude_not_installed() {
-        npm() {
-            if [[ "$*" == "list -g @anthropic-ai/claude-code" ]]; then
-                return 1
-            fi
-        }
-        export -f npm
-    }
-    
-    mock_claude_install_success() {
-        npm() {
-            if [[ "$*" == "install -g @anthropic-ai/claude-code" ]]; then
-                return 0
-            fi
-        }
-        export -f npm
-    }
-    
-    mock_claude_install_failure() {
-        npm() {
-            if [[ "$*" == "install -g @anthropic-ai/claude-code" ]]; then
-                echo "Error: Failed to install package"
-                return 1
-            fi
-        }
-        export -f npm
-    }
-    
-    # Load functions
-    load_claude_functions
+    load_proxy_functions "claude"
+    PACKAGE_NAME=$(get_package_name "claude")
 }
 
 teardown() {
-    # Clean up any exports
-    unset -f node npm 2>/dev/null || true
+    cleanup_mocks
 }
 
-@test "check_nodejs_version succeeds with Node.js installed" {
-    mock_nodejs_success
+@test "check_nodejs_version validates exact version boundary (18.0.0)" {
+    mock_nodejs_success "v18.0.0"
     run _claude_check_nodejs_version
     [ "$status" -eq 0 ]
 }
 
-@test "check_nodejs_version fails without Node.js" {
+@test "check_nodejs_version fails with version below minimum (17.x)" {
+    mock_nodejs_old_version "v17.20.0"
+    run _claude_check_nodejs_version
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"version 17.20.0 is too old"* ]]
+}
+
+@test "check_nodejs_version fails when Node.js not found" {
     mock_nodejs_failure
     run _claude_check_nodejs_version
     [ "$status" -eq 1 ]
+    [[ "$output" == *"Node.js is not installed"* ]]
 }
 
-@test "claude_is_installed returns true when installed" {
-    mock_claude_installed
-    run _claude_is_installed "@anthropic-ai/claude-code"
+@test "check_nodejs_version handles malformed version strings" {
+    mock_nodejs_no_version
+    run _claude_check_nodejs_version
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"Could not determine Node.js version"* ]]
+}
+
+@test "is_installed detects package presence correctly" {
+    mock_package_installed "claude" "$PACKAGE_NAME"
+    run _claude_is_installed "$PACKAGE_NAME"
     [ "$status" -eq 0 ]
 }
 
-@test "claude_is_installed returns false when not installed" {
-    mock_claude_not_installed
-    run _claude_is_installed "@anthropic-ai/claude-code"
+@test "is_installed detects package absence correctly" {
+    mock_package_not_installed "claude" "$PACKAGE_NAME"
+    run _claude_is_installed "$PACKAGE_NAME"
     [ "$status" -eq 1 ]
 }
 
-@test "claude_install_package succeeds with successful npm install" {
-    mock_claude_install_success
-    run _claude_install_package "@anthropic-ai/claude-code"
+@test "install_package handles successful installation" {
+    mock_package_install_success "claude" "$PACKAGE_NAME"
+    run _claude_install_package "$PACKAGE_NAME"
     [ "$status" -eq 0 ]
+    [[ "$output" == *"Successfully installed $PACKAGE_NAME"* ]]
 }
 
-@test "claude_install_package fails with npm error" {
-    mock_claude_install_failure
-    run _claude_install_package "@anthropic-ai/claude-code"
+@test "install_package handles npm errors properly" {
+    mock_package_install_failure "claude" "$PACKAGE_NAME"
+    run _claude_install_package "$PACKAGE_NAME"
     [ "$status" -eq 1 ]
-    [[ "$output" == *"Failed to install @anthropic-ai/claude-code"* ]]
+    [[ "$output" == *"Failed to install $PACKAGE_NAME"* ]]
+}
+
+@test "helper functions exist in script" {
+    grep -q "_claude_check_nodejs_version" "$BATS_TEST_DIRNAME/../../autoload/claude"
+    grep -q "_claude_is_installed" "$BATS_TEST_DIRNAME/../../autoload/claude"
+    grep -q "_claude_install_package" "$BATS_TEST_DIRNAME/../../autoload/claude"
+    grep -q "_claude_prompt_install" "$BATS_TEST_DIRNAME/../../autoload/claude"
 }

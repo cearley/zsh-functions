@@ -2,163 +2,74 @@
 
 # Unit tests for codex script helper functions
 
+load "../helpers.bash"
+
 setup() {
     # Load the codex script functions for testing
-    load_codex_functions() {
-        # Extract and define helper functions from codex script
-        eval "$(sed -n '/^_codex_check_nodejs_version() {/,/^}/p' "$BATS_TEST_DIRNAME/../../autoload/codex")"
-        eval "$(sed -n '/^_codex_is_installed() {/,/^}/p' "$BATS_TEST_DIRNAME/../../autoload/codex")"
-        eval "$(sed -n '/^_codex_prompt_install() {/,/^}/p' "$BATS_TEST_DIRNAME/../../autoload/codex")"
-        eval "$(sed -n '/^_codex_install_package() {/,/^}/p' "$BATS_TEST_DIRNAME/../../autoload/codex")"
-    }
-
-    # Mock functions for testing
-    mock_nodejs_success() {
-        node() { echo "v20.0.0"; }
-        npm() { echo "npm version"; }
-        command() {
-            case "$2" in
-                node) return 0 ;;
-                npm) return 0 ;;
-                *) return 1 ;;
-            esac
-        }
-        export -f node npm command
-    }
-
-    mock_nodejs_failure() {
-        command() {
-            case "$2" in
-                node) return 1 ;;
-                npm) return 1 ;;
-                *) return 1 ;;
-            esac
-        }
-        export -f command
-    }
-
-    mock_nodejs_old_version() {
-        node() { echo "v18.0.0"; }
-        npm() { echo "npm version"; }
-        command() {
-            case "$2" in
-                node) return 0 ;;
-                npm) return 0 ;;
-                *) return 1 ;;
-            esac
-        }
-        export -f node npm command
-    }
-
-    mock_nodejs_no_version() {
-        node() { return 1; }
-        npm() { echo "npm version"; }
-        command() {
-            case "$2" in
-                node) return 0 ;;
-                npm) return 0 ;;
-                *) return 1 ;;
-            esac
-        }
-        export -f node npm command
-    }
-
-    mock_codex_installed() {
-        npm() {
-            if [[ "$*" == "list -g @openai/codex" ]]; then
-                echo "@openai/codex@1.0.0"
-                return 0
-            fi
-        }
-        export -f npm
-    }
-
-    mock_codex_not_installed() {
-        npm() {
-            if [[ "$*" == "list -g @openai/codex" ]]; then
-                return 1
-            fi
-        }
-        export -f npm
-    }
-
-    mock_codex_install_success() {
-        npm() {
-            if [[ "$*" == "install -g @openai/codex" ]]; then
-                return 0
-            fi
-        }
-        export -f npm
-    }
-
-    mock_codex_install_failure() {
-        npm() {
-            if [[ "$*" == "install -g @openai/codex" ]]; then
-                echo "Error: Failed to install package"
-                return 1
-            fi
-        }
-        export -f npm
-    }
-
-    # Load functions
-    load_codex_functions
+    load_proxy_functions "codex"
+    PACKAGE_NAME=$(get_package_name "codex")
 }
 
 teardown() {
-    # Clean up any exports
-    unset -f node npm command 2>/dev/null || true
+    cleanup_mocks
 }
 
-@test "check_nodejs_version succeeds with Node.js 20+" {
-    mock_nodejs_success
+@test "check_nodejs_version validates exact version boundary (20.0.0)" {
+    mock_nodejs_success "v20.0.0"
     run _codex_check_nodejs_version
     [ "$status" -eq 0 ]
 }
 
-@test "check_nodejs_version fails without Node.js" {
+@test "check_nodejs_version fails with version below minimum (19.x)" {
+    mock_nodejs_old_version "v19.20.0"
+    run _codex_check_nodejs_version
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"version 19.20.0 is too old"* ]]
+}
+
+@test "check_nodejs_version fails when Node.js not found" {
     mock_nodejs_failure
     run _codex_check_nodejs_version
     [ "$status" -eq 1 ]
     [[ "$output" == *"Node.js is not installed"* ]]
 }
 
-@test "check_nodejs_version fails with old Node.js version" {
-    mock_nodejs_old_version
-    run _codex_check_nodejs_version
-    [ "$status" -eq 1 ]
-    [[ "$output" == *"version 18.0.0 is too old"* ]]
-}
-
-@test "check_nodejs_version fails when node version cannot be determined" {
+@test "check_nodejs_version handles malformed version strings" {
     mock_nodejs_no_version
     run _codex_check_nodejs_version
     [ "$status" -eq 1 ]
     [[ "$output" == *"Could not determine Node.js version"* ]]
 }
 
-@test "codex_is_installed returns true when installed" {
-    mock_codex_installed
-    run _codex_is_installed "@openai/codex"
+@test "is_installed detects package presence correctly" {
+    mock_package_installed "codex" "$PACKAGE_NAME"
+    run _codex_is_installed "$PACKAGE_NAME"
     [ "$status" -eq 0 ]
 }
 
-@test "codex_is_installed returns false when not installed" {
-    mock_codex_not_installed
-    run _codex_is_installed "@openai/codex"
+@test "is_installed detects package absence correctly" {
+    mock_package_not_installed "codex" "$PACKAGE_NAME"
+    run _codex_is_installed "$PACKAGE_NAME"
     [ "$status" -eq 1 ]
 }
 
-@test "codex_install_package succeeds with successful npm install" {
-    mock_codex_install_success
-    run _codex_install_package "@openai/codex"
+@test "install_package handles successful installation" {
+    mock_package_install_success "codex" "$PACKAGE_NAME"
+    run _codex_install_package "$PACKAGE_NAME"
     [ "$status" -eq 0 ]
-    [[ "$output" == *"Successfully installed @openai/codex"* ]]
+    [[ "$output" == *"Successfully installed $PACKAGE_NAME"* ]]
 }
 
-@test "codex_install_package fails with npm error" {
-    mock_codex_install_failure
-    run _codex_install_package "@openai/codex"
+@test "install_package handles npm errors properly" {
+    mock_package_install_failure "codex" "$PACKAGE_NAME"
+    run _codex_install_package "$PACKAGE_NAME"
     [ "$status" -eq 1 ]
-    [[ "$output" == *"Failed to install @openai/codex"* ]]
+    [[ "$output" == *"Failed to install $PACKAGE_NAME"* ]]
+}
+
+@test "helper functions exist in script" {
+    grep -q "_codex_check_nodejs_version" "$BATS_TEST_DIRNAME/../../autoload/codex"
+    grep -q "_codex_is_installed" "$BATS_TEST_DIRNAME/../../autoload/codex"
+    grep -q "_codex_install_package" "$BATS_TEST_DIRNAME/../../autoload/codex"
+    grep -q "_codex_prompt_install" "$BATS_TEST_DIRNAME/../../autoload/codex"
 }
