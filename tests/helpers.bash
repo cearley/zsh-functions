@@ -152,7 +152,7 @@ mock_package_install_success() {
     local cmd_name="$1"
     local mock_package="$2"
     eval "npm() {
-        if [[ \"\$*\" == \"install -g $mock_package\" ]]; then
+        if [[ \"\$*\" == \"install -g $mock_package\" || \"\$*\" == \"install -g $mock_package@latest\" ]]; then
             return 0
         fi
         return 0
@@ -166,7 +166,7 @@ mock_package_install_failure() {
     local cmd_name="$1"
     local mock_package="$2"
     eval "npm() {
-        if [[ \"\$*\" == \"install -g $mock_package\" ]]; then
+        if [[ \"\$*\" == \"install -g $mock_package\" || \"\$*\" == \"install -g $mock_package@latest\" ]]; then
             echo \"Error: Failed to install package\"
             return 1
         fi
@@ -204,6 +204,9 @@ setup_integration_test() {
             ;;
         codex)
             export CODEX_SCRIPT="$BATS_TEST_DIRNAME/../../autoload/codex"
+            ;;
+        qwen)
+            export QWEN_SCRIPT="$BATS_TEST_DIRNAME/../../autoload/qwen"
             ;;
     esac
 }
@@ -250,7 +253,7 @@ create_mock_npm_not_installed() {
 #!/bin/bash
 if [[ "\$1" == "list" && "\$2" == "-g" && "\$3" == "$package_name" ]]; then
     exit 1  # Not installed
-elif [[ "\$1" == "install" && "\$2" == "-g" && "\$3" == "$package_name" ]]; then
+elif [[ "\$1" == "install" && "\$2" == "-g" && ("\$3" == "$package_name" || "\$3" == "$package_name@latest") ]]; then
     echo "Installing $package_name globally..."
     echo "Successfully installed $package_name"
     exit 0
@@ -307,6 +310,7 @@ get_package_name() {
         claude) echo "@anthropic-ai/claude-code" ;;
         gemini) echo "@google/gemini-cli" ;;
         codex) echo "@openai/codex" ;;
+        qwen) echo "@qwen-code/qwen-code" ;;
         *) echo "unknown-package" ;;
     esac
 }
@@ -318,6 +322,7 @@ get_min_node_version() {
         claude) echo "18" ;;
         gemini) echo "20" ;;
         codex) echo "20" ;;
+        qwen) echo "20" ;;
         *) echo "18" ;;
     esac
 }

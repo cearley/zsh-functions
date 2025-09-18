@@ -42,6 +42,7 @@ jobs:
         [ -f autoload/claude ] && [ -x autoload/claude ]
         [ -f autoload/gemini ] && [ -x autoload/gemini ]
         [ -f autoload/codex ] && [ -x autoload/codex ]
+        [ -f autoload/qwen ] && [ -x autoload/qwen ]
         [ -f autoload/brew-list-formulas ] && [ -x autoload/brew-list-formulas ]
         [ -f autoload/hello ] && [ -x autoload/hello ]
 

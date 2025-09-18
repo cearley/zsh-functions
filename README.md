@@ -12,7 +12,9 @@ A collection of useful zsh shell functions with comprehensive testing.
 ## Available Functions
 
 - **[claude](#claude)** - Transparent proxy to the `@anthropic-ai/claude-code` npm package
-- **[gemini](#gemini)** - Transparent proxy to the `@google/gemini-cli` npm package  
+- **[codex](#codex)** - Transparent proxy to the `@openai/codex` npm package
+- **[gemini](#gemini)** - Transparent proxy to the `@google/gemini-cli` npm package
+- **[qwen](#qwen)** - Transparent proxy to the `@qwen-code/qwen-code` npm package
 - **[brew-list-formulas](#brew-list-formulas)** - Lists formulas from Homebrew taps
 
 
@@ -42,7 +44,7 @@ Tests use [Bats testing framework](https://github.com/bats-core/bats-core):
 # Install Bats
 brew install bats-core
 
-# Run all tests (32 tests total)
+# Run all tests (57 tests total)
 bats tests/unit/ tests/integration/
 
 # Run specific test types
@@ -83,7 +85,9 @@ Available tasks (Cmd+Shift+P → "Tasks: Run Task"):
 ```
 ├── autoload/              # Zsh autoloadable function files
 │   ├── claude             # Claude AI proxy
+│   ├── codex              # Codex AI proxy
 │   ├── gemini             # Gemini AI proxy
+│   ├── qwen               # Qwen AI proxy
 │   ├── brew-list-formulas # Homebrew utility
 │   └── hello              # Demo function
 ├── tests/                 # Test suite
@@ -99,7 +103,7 @@ Available tasks (Cmd+Shift+P → "Tasks: Run Task"):
 - **Zsh shell**
 - **Bats** (for testing): `brew install bats-core`
 - **Node.js ≥18** (for claude function)
-- **Node.js ≥20** (for gemini function)
+- **Node.js ≥20** (for codex, gemini, and qwen functions)
 
 ## Functions
 
@@ -116,6 +120,20 @@ Transparent proxy to the `@anthropic-ai/claude-code` npm package. Automatically 
 claude "Write a hello world function"
 ```
 
+### codex
+Transparent proxy to the `@openai/codex` npm package. Automatically handles installation and setup.
+
+**Features:**
+- Checks for Node.js (≥20) and npm
+- Prompts to install package if missing
+- Passes all arguments to the actual codex command
+
+**Usage:**
+```bash
+codex "Write a function to parse JSON"
+codex --model code-davinci-002 "Generate unit tests"
+```
+
 ### gemini
 Transparent proxy to the `@google/gemini-cli` npm package. Automatically handles installation and setup.
 
@@ -128,6 +146,20 @@ Transparent proxy to the `@google/gemini-cli` npm package. Automatically handles
 ```bash
 gemini "Explain the architecture of this codebase"
 gemini -m gemini-2.5-flash "Generate tests for this function"
+```
+
+### qwen
+Transparent proxy to the `@qwen-code/qwen-code` npm package. Automatically handles installation and setup.
+
+**Features:**
+- Checks for Node.js (≥20) and npm
+- Prompts to install package if missing
+- Passes all arguments to the actual qwen command
+
+**Usage:**
+```bash
+qwen "Refactor this code for better performance"
+qwen --help
 ```
 
 ### brew-list-formulas
@@ -145,8 +177,8 @@ brew-list-formulas homebrew/core
 brew-list-formulas tap1/name tap2/name
 ```
 
-### Note on claude and gemini functions
-These functions are called 'transparent proxies' because they automatically check for and install the required npm packages (like `@anthropic-ai/claude-code` or `@google/gemini-cli`) the first time you use them. This is especially helpful for developers who use multiple Node.js environments (for example, with nvm or asdf), where global npm packages might not always be available in every environment.
+### Note on AI proxy functions (claude, codex, gemini, qwen)
+These functions are called 'transparent proxies' because they automatically check for and install the required npm packages (like `@anthropic-ai/claude-code`, `@openai/codex`, `@google/gemini-cli`, or `@qwen-code/qwen-code`) the first time you use them. This is especially helpful for developers who use multiple Node.js environments (for example, with nvm or asdf), where global npm packages might not always be available in every environment.
 
 **Advantages:**
 - You don't have to manually install or update the CLI tools—they are installed for you if missing.

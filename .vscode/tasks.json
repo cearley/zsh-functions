@@ -2,25 +2,9 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Test All Functions",
-			"type": "shell",
-			"command": "source .env 2>/dev/null || true; for func in ./src/*; do if [[ -f \"$func\" && -x \"$func\" ]]; then echo \"Testing $func...\"; zsh -c \"source '$func' && echo 'Successfully loaded $func'\"; fi; done",
-			"group": "test",
-			"isBackground": false,
-			"problemMatcher": []
-		},
-		{
-			"label": "Sync to ~/.zfunc",
-			"type": "shell",
-			"command": "source .env 2>/dev/null || true; cp -v ./src/* \"${ZFUNC_SYNC_DIR:-~/.zfunc}/\" && echo \"Functions synced to ${ZFUNC_SYNC_DIR:-~/.zfunc}\"",
-			"group": "build",
-			"isBackground": false,
-			"problemMatcher": []
-		},
-		{
 			"label": "Make Functions Executable",
 			"type": "shell",
-			"command": "source .env 2>/dev/null || true; chmod +x ./src/*",
+			"command": "chmod +x ./autoload/*",
 			"group": "build",
 			"isBackground": false,
 			"problemMatcher": []
@@ -28,7 +12,7 @@
 		{
 			"label": "Validate Shell Scripts",
 			"type": "shell",
-			"command": "source .env 2>/dev/null || true; for func in ./src/*; do if [[ -f \"$func\" && -x \"$func\" ]]; then echo \"Checking $func...\"; shellcheck \"$func\" || echo \"Warning: shellcheck failed for $func\"; fi; done",
+			"command": "shellcheck ./autoload/*",
 			"group": "test",
 			"isBackground": false,
 			"problemMatcher": []
