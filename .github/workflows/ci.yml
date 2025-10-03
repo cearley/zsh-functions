@@ -48,5 +48,5 @@ jobs:
 
         echo "✓ Autoload directory test passed"
         
-    - name: Run tests
-      run: bats tests/unit/ tests/integration/
+    - name: Run integration tests
+      run: bats tests/integration/

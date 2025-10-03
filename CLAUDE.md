@@ -5,15 +5,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 **Testing:**
-- `bats tests/unit/ tests/integration/` - Run full test suite (57 tests total)
-- `bats tests/unit/` - Run unit tests only
-- `bats tests/integration/` - Run integration tests only
+- `bats tests/integration/` - Run integration test suite (20 tests - primary suite)
+- `bats tests/unit/` - Run unit tests (reserved for complex logic when added)
 - `act` - Test GitHub Actions CI workflow locally (requires Docker)
+
+**Testing Philosophy:**
+- Integration-first approach: Functions are thin shell wrappers, integration tests provide optimal coverage
+- See [docs/TESTING_STRATEGY.md](docs/TESTING_STRATEGY.md) for detailed testing philosophy and guidelines
 
 **Development workflow:**
 - `shellcheck autoload/*` - Validate shell scripts
 - `chmod +x autoload/*` - Make functions executable
-- Test with `bats tests/unit/ tests/integration/`
+- Test with `bats tests/integration/`
 
 **VS Code tasks available:**
 - "Run All Tests (Bats)" - Execute full test suite
@@ -25,7 +28,9 @@ This is a zsh functions collection with a modular, autoloadable design. Each fun
 
 **Core Structure:**
 - `autoload/` - Autoloadable zsh function files (claude, codex, gemini, qwen, brew-list-formulas, hello)
-- `tests/` - Comprehensive Bats-based test suite with unit and integration tests
+- `tests/integration/` - Integration test suite validating full script execution workflows
+- `tests/unit/` - Unit tests (reserved for complex logic as codebase evolves)
+- `docs/` - Documentation including testing strategy and guidelines
 - `.github/workflows/ci.yml` - GitHub Actions CI/CD pipeline
 
 **Function Architecture Pattern:**
@@ -87,7 +92,8 @@ Functions are used directly from the cloned repository:
 - Implement comprehensive input validation
 - Include user-friendly error messages to stderr
 - Use descriptive variable names and consistent formatting
-- Test functions thoroughly with both unit and integration tests
+- Test functions with integration tests; add unit tests only for complex algorithmic logic
+- See [docs/TESTING_STRATEGY.md](docs/TESTING_STRATEGY.md) for when to add unit tests
 
 ## Continuous Integration
 
@@ -131,4 +137,5 @@ act -P ubuntu-latest=catthehacker/ubuntu:act-22.04
 **Important Notes:**
 - Some integration tests are conditionally skipped in CI environments where Node.js is installed system-wide
 - The CI uses Ubuntu 22.04 container for consistent, clean testing environment
-- All 57 tests should pass for successful CI completion
+- All integration tests should pass for successful CI completion
+- See [docs/TESTING_STRATEGY.md](docs/TESTING_STRATEGY.md) for our integration-first testing philosophy
