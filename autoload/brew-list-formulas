@@ -1,8 +1,6 @@
 #!/usr/bin/env zsh
 # Courtesy of https://stackoverflow.com/questions/25334787/homebrew-get-list-of-formulas-in-a-tap
 
-echo initialising...
-
 # Lists formulas from a given brew tap
 # Call it with one or more taps to see their formulas
 #   e.g.: brew-list-formulas tap/tap othertap/othertap
@@ -18,7 +16,7 @@ brew-list-formulas () {
     echo "";
     brew tap;
   else
-    echo "Formulas for tap(s) $* are:"
+    echo "Formulas for tap(s) $@ are:"
     echo "";
     brew tap-info --json "$@" | jq -r '.[]|(.formula_names[],.cask_tokens[])' | sort -V;
   fi

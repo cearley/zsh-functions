@@ -4,79 +4,22 @@
 # Checks for @openai/codex package and installs if needed.
 # Acts as transparent proxy to the actual codex command.
 
-_codex_check_nodejs_version() {
-    if ! command -v node >/dev/null 2>&1; then
-        echo "Error: Node.js is not installed. Please install Node.js version 20 or higher." >&2
-        return 1
-    fi
-    
-    if ! command -v npm >/dev/null 2>&1; then
-        echo "Error: npm is not available. Please ensure npm is installed and in your PATH." >&2
-        return 1
-    fi
-    
-    local node_version
-    node_version=$(node --version 2>/dev/null | sed 's/^v//')
-    
-    if [[ -z "$node_version" ]]; then
-        echo "Error: Could not determine Node.js version." >&2
-        return 1
-    fi
-    
-    local major_version
-    major_version=$(echo "$node_version" | cut -d. -f1)
-    
-    if [[ "$major_version" -lt 20 ]]; then
-        echo "Error: Node.js version $node_version is too old. Please install Node.js version 20 or higher." >&2
-        return 1
-    fi
-    
-    return 0
-}
-
-_codex_is_installed() {
-    local codex_pkg="$1"
-    npm list -g "$codex_pkg" >/dev/null 2>&1
-}
-
-_codex_prompt_install() {
-    local codex_pkg="$1"
-    echo "The $codex_pkg npm package is not installed."
-    echo -n "Would you like to install it globally? (y/N): "
-    read -r response
-    case "$response" in
-        [yY]|[yY][eE][sS])
-            return 0
-            ;;
-        *)
-            return 1
-            ;;
-    esac
-}
-
-_codex_install_package() {
-    local codex_pkg="$1"
-    echo "Installing $codex_pkg globally..."
-    if npm install -g "$codex_pkg"; then
-        echo "Successfully installed $codex_pkg"
-        return 0
-    else
-        echo "Failed to install $codex_pkg" >&2
-        return 1
-    fi
+source "${0:A:h}/../lib/_common_proxy_lib" 2>/dev/null || {
+    echo "Error: Could not load common proxy library." >&2
+    return 1
 }
 
 # Main codex function - this gets redefined to be the actual function.
 codex() {
     local codex_pkg="@openai/codex"
     
-    if ! _codex_check_nodejs_version; then
+    if ! _common_check_nodejs_version 20 "codex"; then
         return 1
     fi
     
-    if ! _codex_is_installed "$codex_pkg"; then
-        if _codex_prompt_install "$codex_pkg"; then
-            if ! _codex_install_package "$codex_pkg"; then
+    if ! _common_is_installed "$codex_pkg"; then
+        if _common_prompt_install "$codex_pkg"; then
+            if ! _common_install_package "$codex_pkg"; then
                 echo "Installation failed. Exiting." >&2
                 return 1
             fi
@@ -87,12 +30,7 @@ codex() {
     fi
 
     # Run the actual codex command with all passed arguments and handle errors
-    command codex "$@"
-    local exit_code=$?
-    if [[ $exit_code -ne 0 ]]; then
-        echo "Error: Codex command failed with exit code $exit_code" >&2
-        return $exit_code
-    fi
+    _common_run_command "codex" "$@"
 }
 
 # Run the function with the current arguments.

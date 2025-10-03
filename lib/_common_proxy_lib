@@ -1,0 +1,100 @@
+#!/usr/bin/env zsh
+
+# Common library for AI command proxy functions.
+# Provides shared functionality for dependency checking, package installation, etc.
+
+# Check if Node.js is installed and meets minimum version requirements
+# Usage: _common_check_nodejs_version <minimum_version> <command_name>
+_common_check_nodejs_version() {
+    local min_version="$1"
+    local cmd_name="$2"
+    
+    if ! command -v node >/dev/null 2>&1; then
+        echo "Error: Node.js is not installed. Please install Node.js version $min_version or higher." >&2
+        return 1
+    fi
+    
+    if ! command -v npm >/dev/null 2>&1; then
+        echo "Error: npm is not available. Please ensure npm is installed and in your PATH." >&2
+        return 1
+    fi
+    
+    local node_version
+    node_version=$(node --version 2>/dev/null | sed 's/^v//')
+    
+    if [[ -z "$node_version" ]]; then
+        echo "Error: Could not determine Node.js version." >&2
+        return 1
+    fi
+    
+    local major_version
+    major_version=$(echo "$node_version" | cut -d. -f1)
+    
+    if [[ "$major_version" -lt "$min_version" ]]; then
+        echo "Error: Node.js version $node_version is too old. Please install Node.js version $min_version or higher." >&2
+        return 1
+    fi
+    
+    return 0
+}
+
+# Check if a package is installed globally
+# Usage: _common_is_installed <package_name>
+_common_is_installed() {
+    local pkg="$1"
+    npm list -g "$pkg" >/dev/null 2>&1
+}
+
+# Prompt user for package installation
+# Usage: _common_prompt_install <package_name>
+_common_prompt_install() {
+    local pkg="$1"
+    echo "The $pkg npm package is not installed."
+    echo "Security notice: You are about to install an external npm package globally."
+    echo "Please ensure you trust this package before proceeding."
+    echo -n "Would you like to install it globally? (y/N): "
+    read -r response
+    case "$response" in
+        [yY] | [yY][eE][sS])
+            return 0
+            ;;
+        [nN] | [nN][oO] | "")
+            return 1
+            ;;
+        *)
+            echo "Invalid response. Please answer yes or no." >&2
+            return 1
+            ;;
+    esac
+}
+
+# Install a package globally
+# Usage: _common_install_package <package_name>
+_common_install_package() {
+    local pkg="$1"
+    echo "Installing $pkg globally..."
+    if npm install -g "$pkg"; then
+        echo "Successfully installed $pkg"
+        return 0
+    else
+        echo "Failed to install $pkg" >&2
+        return 1
+    fi
+}
+
+# Run command with proper error handling
+# Usage: _common_run_command <command_name> <...args>
+_common_run_command() {
+    local cmd_name="$1"
+    shift
+    command "$cmd_name" "$@"
+    local exit_code=$?
+    if [[ $exit_code -ne 0 ]]; then
+        # Capitalize the first letter of the command name for the error message
+        local first_char="${cmd_name:0:1}"
+        local rest_chars="${cmd_name:1}"
+        local capitalized_cmd_name="${(U)first_char}${rest_chars}"
+        echo "Error: $capitalized_cmd_name command failed with exit code $exit_code" >&2
+        return $exit_code
+    fi
+}
