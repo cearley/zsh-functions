@@ -4,6 +4,7 @@
 # Checks for @google/gemini-cli package and installs if needed.
 # Acts as transparent proxy to the actual gemini command.
 
+# shellcheck source=../lib/_common_proxy_lib
 source "${0:A:h}/../lib/_common_proxy_lib" 2>/dev/null || {
     echo "Error: Could not load common proxy library." >&2
     return 1
