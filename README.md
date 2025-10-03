@@ -20,12 +20,14 @@ A collection of useful zsh shell functions with comprehensive testing.
 
 ## Installation
 
+The `autoload/` directory contains **zsh autoloadable functions** - special shell functions that are loaded automatically by zsh when first called, rather than being loaded into memory immediately.
+
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/cearley/zsh-functions.git ~/.zsh-functions
    ```
 
-2. **Add to your `~/.zshrc`:**
+2. **Add autoload functions to your `~/.zshrc`:**
    ```bash
    # Add zsh-functions to fpath and autoload all functions
    fpath=("$HOME/.zsh-functions/autoload" $fpath)
@@ -61,10 +63,16 @@ Available tasks (Cmd+Shift+P → "Tasks: Run Task"):
 
 ### Adding New Functions
 
-1. Create function in `src/directory`
+1. Create function in `autoload/`
 2. Follow zsh function conventions:
    ```bash
    #!/usr/bin/env zsh
+   
+   # Source common library if needed (for proxy functions)
+   # source "${0:A:h}/../lib/_common_proxy_lib" 2>/dev/null || {
+   #     echo "Error: Could not load common proxy library." >&2
+   #     return 1
+   # }
    
    # Function description
    function_name() {
@@ -72,9 +80,7 @@ Available tasks (Cmd+Shift+P → "Tasks: Run Task"):
    }
    
    # Auto-execute if called directly
-   if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-       function_name "$@"
-   fi
+   function_name "$@"
    ```
 
 3. Make executable: `chmod +x autoload/function_name`
@@ -83,13 +89,15 @@ Available tasks (Cmd+Shift+P → "Tasks: Run Task"):
 ## Project Structure
 
 ```
-├── autoload/              # Zsh autoloadable function files
+├── autoload/              # Zsh autoloadable function files (loaded when first called)
 │   ├── claude             # Claude AI proxy
 │   ├── codex              # Codex AI proxy
 │   ├── gemini             # Gemini AI proxy
 │   ├── qwen               # Qwen AI proxy
 │   ├── brew-list-formulas # Homebrew utility
 │   └── hello              # Demo function
+├── lib/                   # Shared library files
+│   └── _common_proxy_lib  # Common functionality for AI proxies
 ├── tests/                 # Test suite
 │   ├── unit/              # Unit tests
 │   ├── integration/       # Integration tests

@@ -16,7 +16,7 @@ brew-list-formulas () {
     echo "";
     brew tap;
   else
-    echo "Formulas for tap(s) $@ are:"
+    echo "Formulas for tap(s)" "$*" "are:"
     echo "";
     brew tap-info --json "$@" | jq -r '.[]|(.formula_names[],.cask_tokens[])' | sort -V;
   fi
