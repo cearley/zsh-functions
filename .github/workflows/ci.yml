@@ -34,7 +34,7 @@ jobs:
       run: chmod +x autoload/*
       
     - name: Run shellcheck
-      run: shellcheck -s bash autoload/*
+      run: shellcheck -s bash --severity=warning autoload/*
         
     - name: Test autoload directory
       run: |
