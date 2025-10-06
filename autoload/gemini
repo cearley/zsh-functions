@@ -5,10 +5,27 @@
 # Acts as transparent proxy to the actual gemini command.
 
 # shellcheck source=../lib/_common_proxy_lib
-source "${0:A:h}/../lib/_common_proxy_lib" 2>/dev/null || {
+{
+    # Determine the project root directory relative to this function file and source the library
+    SCRIPT_DIR="${0:A:h}"
+    PROJECT_ROOT="${SCRIPT_DIR:h}"
+    source "$PROJECT_ROOT/lib/_common_proxy_lib" 2>/dev/null && sourced=1
+
+    # Fallback: try to source from the original relative path for compatibility
+    if [[ ! -v sourced ]]; then
+        source "${0:A:h}/../lib/_common_proxy_lib" 2>/dev/null && sourced=1
+    fi
+
+    # Double fallback: try to source from the project root (for cases where this file is symlinked or copied)
+    if [[ ! -v sourced ]]; then
+        source "$(cd "$(dirname "$0")/.." && pwd)/lib/_common_proxy_lib" 2>/dev/null && sourced=1
+    fi
+}
+
+if [[ ! -v sourced ]]; then
     echo "Error: Could not load common proxy library." >&2
     return 1
-}
+fi
 
 # Main gemini function - this gets redefined to be the actual function.
 gemini() {
