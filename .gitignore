@@ -34,5 +34,9 @@ test-results/
 
 # Shell history and temporary files
 .zsh_history
-.bash_history
+.bash_historya
 *.code-workspace
+
+# Serena configuration and cache
+.serena
+/cache

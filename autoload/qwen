@@ -4,21 +4,19 @@
 # Checks for @qwen-code/qwen-code package and installs if needed.
 # Acts as transparent proxy to the actual qwen command.
 
+# Load zsh/parameter module for functions_source array
+zmodload zsh/parameter 2>/dev/null
+
 # shellcheck source=../lib/_common_proxy_lib
 {
-    # Determine the project root directory relative to this function file and source the library
-    SCRIPT_DIR="${0:A:h}"
-    PROJECT_ROOT="${SCRIPT_DIR:h}"
-    source "$PROJECT_ROOT/lib/_common_proxy_lib" 2>/dev/null && sourced=1
-
-    # Fallback: try to source from the original relative path for compatibility
-    if [[ ! -v sourced ]]; then
-        source "${0:A:h}/../lib/_common_proxy_lib" 2>/dev/null && sourced=1
+    # Primary: Use functions_source to get the actual file path (works with autoload)
+    if [[ -v functions_source[$0] ]]; then
+        source "${functions_source[$0]:h}/../lib/_common_proxy_lib" 2>/dev/null && sourced=1
     fi
 
-    # Double fallback: try to source from the project root (for cases where this file is symlinked or copied)
+    # Fallback: try the original relative path (direct execution, symlinks)
     if [[ ! -v sourced ]]; then
-        source "$(cd "$(dirname "$0")/.." && pwd)/lib/_common_proxy_lib" 2>/dev/null && sourced=1
+        source "${0:A:h}/../lib/_common_proxy_lib" 2>/dev/null && sourced=1
     fi
 }
 

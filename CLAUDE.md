@@ -28,15 +28,75 @@ This is a zsh functions collection with a modular, autoloadable design. Each fun
 
 **Core Structure:**
 - `autoload/` - Autoloadable zsh function files (claude, codex, gemini, qwen, brew-list-formulas, hello)
-- `tests/integration/` - Integration test suite validating full script execution workflows
+- `lib/` - Shared library files
+  - `_common_proxy_lib` - Common functionality for AI proxy functions
+- `tests/integration/` - Integration test suite validating full script execution workflows (20 tests)
 - `tests/unit/` - Unit tests (reserved for complex logic as codebase evolves)
 - `docs/` - Documentation including testing strategy and guidelines
 - `.github/workflows/ci.yml` - GitHub Actions CI/CD pipeline
+
+**AI Proxy Functions:**
+
+The core AI proxy functions (claude, codex, gemini, qwen) are transparent wrappers around npm packages:
+- **claude**: `@anthropic-ai/claude-code` (Node.js ≥18)
+- **codex**: `@openai/codex` (Node.js ≥20)
+- **gemini**: `@google/gemini-cli` (Node.js ≥20)
+- **qwen**: `@qwen-code/qwen-code` (Node.js ≥20)
+
+Each proxy function:
+1. Sources the common proxy library with multi-location fallback strategy
+2. Checks for required Node.js version
+3. Verifies if the npm package is installed
+4. Prompts user for installation if missing
+5. Passes all arguments to the actual command
+
+**Common Proxy Library (`lib/_common_proxy_lib`):**
+
+Provides shared functionality to reduce code duplication:
+- `_common_check_nodejs_version`: Validates Node.js version requirements
+- `_common_is_installed`: Checks if npm package is installed globally
+- `_common_prompt_install`: Handles user prompts for package installation
+- `_common_install_package`: Installs npm packages globally with error handling
+- `_common_run_command`: Executes commands with proper error handling
+
+**Library Loading Strategy:**
+
+The proxy functions use a two-tier sourcing approach to handle both autoloaded and directly-executed scenarios:
+
+```bash
+# Load zsh/parameter module for functions_source array
+zmodload zsh/parameter 2>/dev/null
+
+# Primary: Use functions_source to get actual file path (works with autoload)
+if [[ -v functions_source[$0] ]]; then
+    source "${functions_source[$0]:h}/../lib/_common_proxy_lib" 2>/dev/null && sourced=1
+fi
+
+# Fallback: Relative path for direct execution and symlinks
+if [[ ! -v sourced ]]; then
+    source "${0:A:h}/../lib/_common_proxy_lib" 2>/dev/null && sourced=1
+fi
+
+# Error if both attempts fail
+if [[ ! -v sourced ]]; then
+    echo "Error: Could not load common proxy library." >&2
+    return 1
+fi
+```
+
+**How it works:**
+
+1. **Autoloaded functions** (primary use case): When a function is autoloaded via `fpath`, `$0` contains just the function name (e.g., `claude`), and `${0:A}` resolves to `$PWD/$0` (current working directory + function name), not the actual file path. The `functions_source` array from the `zsh/parameter` module provides the actual source file path, enabling reliable library loading regardless of the current working directory.
+
+2. **Direct execution and symlinks** (fallback): When the script is executed directly (e.g., `./autoload/claude`) or via symlink, `$functions_source` is not set. The `${0:A:h}` expansion resolves the absolute path (following symlinks via `:A`), allowing the library to be found relative to the script location.
 
 **Function Architecture Pattern:**
 Each function follows this structure:
 ```bash
 #!/usr/bin/env zsh
+
+# Source common library if needed (for proxy functions)
+# [Multi-location sourcing as shown above]
 
 # Helper functions with _ prefix
 _private_helper() { ... }
@@ -53,10 +113,13 @@ function_name "$@"
 
 **Key Design Principles:**
 - Functions are autoloadable and self-contained
+- Transparent proxy pattern with automatic dependency management
+- Shared libraries for common functionality (reduces duplication)
 - Comprehensive error handling with proper exit codes
 - Interactive prompts for user confirmation (e.g., package installation)
 - Dependency validation before execution
-- Security-conscious scripting practices
+- Security-conscious scripting practices with user warnings
+- Multi-location library loading for deployment flexibility
 
 **Development Environment:**
 - Supports both manual testing and automated Bats testing
