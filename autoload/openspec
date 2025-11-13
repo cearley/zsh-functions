@@ -27,7 +27,7 @@ fi
 
 # Main openspec function - this gets redefined to be the actual function.
 openspec() {
-    local openspec_pkg="@fission-ai/openspec@latest"
+    local openspec_pkg="@fission-ai/openspec"
     
     if ! _common_check_nodejs_version 20 "openspec"; then
         return 1
