@@ -1,0 +1,53 @@
+#!/usr/bin/env zsh
+
+# OpenSpec command proxy function.
+# Checks for @fission-ai/openspec package and installs if needed.
+# Acts as transparent proxy to the actual openspec command.
+
+# Load zsh/parameter module for functions_source array
+zmodload zsh/parameter 2>/dev/null
+
+# shellcheck source=../lib/_common_proxy_lib
+{
+    # Primary: Use functions_source to get the actual file path (works with autoload)
+    if [[ -v functions_source[$0] ]]; then
+        source "${functions_source[$0]:h}/../lib/_common_proxy_lib" 2>/dev/null && sourced=1
+    fi
+
+    # Fallback: try the original relative path (direct execution, symlinks)
+    if [[ ! -v sourced ]]; then
+        source "${0:A:h}/../lib/_common_proxy_lib" 2>/dev/null && sourced=1
+    fi
+}
+
+if [[ ! -v sourced ]]; then
+    echo "Error: Could not load common proxy library." >&2
+    return 1
+fi
+
+# Main openspec function - this gets redefined to be the actual function.
+openspec() {
+    local openspec_pkg="@fission-ai/openspec@latest"
+    
+    if ! _common_check_nodejs_version 20 "openspec"; then
+        return 1
+    fi
+    
+    if ! _common_is_installed "$openspec_pkg"; then
+        if _common_prompt_install "$openspec_pkg"; then
+            if ! _common_install_package "$openspec_pkg"; then
+                echo "Installation failed. Exiting." >&2
+                return 1
+            fi
+        else
+            echo "Installation declined. Exiting."
+            return 0
+        fi
+    fi
+
+    # Run the actual openspec command with all passed arguments and handle errors
+    _common_run_command "openspec" "$@"
+}
+
+# Run the function with the current arguments.
+openspec "$@"
