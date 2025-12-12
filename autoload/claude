@@ -46,7 +46,7 @@ claude() {
     fi
 
     # Run the actual claude command with all passed arguments and handle errors
-    _common_run_command "claude" "$@"
+    _common_run_command "claude" "$claude_pkg" "$@"
 }
 
 # Run the function with the current arguments.

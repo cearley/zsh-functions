@@ -2,6 +2,8 @@
 
 # Integration tests for codex script end-to-end functionality
 
+bats_require_minimum_version 1.5.0
+
 load "../helpers.bash"
 
 setup() {
@@ -56,13 +58,51 @@ teardown() {
     [[ "$output" == *"codex executed with args: arg1 arg2 --flag value"* ]]
 }
 
-@test "codex script handles command execution failures properly" {
+@test "codex script handles command execution failures with generic error message" {
     create_mock_node_good "v20.17.0"
     create_mock_npm_installed "codex" "$PACKAGE_NAME"
     create_mock_command_failure "codex" 42
 
     run zsh "$CODEX_SCRIPT" failing-command
     [ "$status" -eq 42 ]
-    [[ "$output" == *"codex command failed"* ]]
     [[ "$output" == *"Codex command failed with exit code 42"* ]]
+    [[ "$output" == *"Troubleshooting Steps"* ]]
+}
+
+@test "codex script handles command not found (exit 127) with diagnostics" {
+    create_mock_node_good "v20.17.0"
+    create_mock_npm_with_package_structure "codex" "$PACKAGE_NAME"
+    create_mock_command_not_found "codex"
+
+    run -127 zsh "$CODEX_SCRIPT" test-arg
+    [ "$status" -eq 127 ]
+    [[ "$output" == *"Codex command failed with exit code 127"* ]]
+    [[ "$output" == *"Command 'codex' not found in PATH"* ]]
+    [[ "$output" == *"Diagnostic Information"* ]]
+    [[ "$output" == *"npm uninstall -g $PACKAGE_NAME"* ]]
+    [[ "$output" == *"npm install -g $PACKAGE_NAME"* ]]
+}
+
+@test "codex script handles permission denied (exit 126) with helpful guidance" {
+    create_mock_node_good "v20.17.0"
+    create_mock_npm_installed "codex" "$PACKAGE_NAME"
+    create_mock_command_permission_denied "codex"
+
+    run -126 zsh "$CODEX_SCRIPT" test-arg
+    [ "$status" -eq 126 ]
+    [[ "$output" == *"Codex command failed with exit code 126"* ]]
+    [[ "$output" == *"Permission denied"* ]]
+    [[ "$output" == *"Check executable permissions"* ]]
+}
+
+@test "codex script handles generic failure (exit 1) with troubleshooting steps" {
+    create_mock_node_good "v20.17.0"
+    create_mock_npm_installed "codex" "$PACKAGE_NAME"
+    create_mock_command_failure "codex" 1
+
+    run -1 zsh "$CODEX_SCRIPT" test-arg
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"Codex command failed with exit code 1"* ]]
+    [[ "$output" == *"Command executed but returned an error"* ]]
+    [[ "$output" == *"Troubleshooting Steps"* ]]
 }

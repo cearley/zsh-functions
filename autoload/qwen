@@ -46,7 +46,7 @@ qwen() {
     fi
 
     # Run the actual qwen command with all passed arguments and handle errors
-    _common_run_command "qwen" "$@"
+    _common_run_command "qwen" "$qwen_pkg" "$@"
 }
 
 # Run the function with the current arguments.

@@ -46,7 +46,7 @@ gemini() {
     fi
 
     # Run the actual gemini command with all passed arguments and handle errors
-    _common_run_command "gemini" "$@"
+    _common_run_command "gemini" "$gemini_pkg" "$@"
 }
 
 # Run the function with the current arguments.

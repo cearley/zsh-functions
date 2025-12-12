@@ -64,6 +64,9 @@ setup_integration_test() {
         qwen)
             export QWEN_SCRIPT="$BATS_TEST_DIRNAME/../../autoload/qwen"
             ;;
+        openspec)
+            export OPENSPEC_SCRIPT="$BATS_TEST_DIRNAME/../../autoload/openspec"
+            ;;
     esac
 }
 
@@ -159,6 +162,72 @@ EOF
     chmod +x "$TEST_DIR/$cmd_name"
 }
 
+# Create mock command that returns exit code 127 (command not found)
+# Usage: create_mock_command_not_found "claude"
+create_mock_command_not_found() {
+    local cmd_name="$1"
+    cat > "$TEST_DIR/$cmd_name" << 'EOF'
+#!/bin/bash
+exit 127
+EOF
+    chmod +x "$TEST_DIR/$cmd_name"
+}
+
+# Create mock command that returns exit code 126 (permission denied)
+# Usage: create_mock_command_permission_denied "claude"
+create_mock_command_permission_denied() {
+    local cmd_name="$1"
+    cat > "$TEST_DIR/$cmd_name" << 'EOF'
+#!/bin/bash
+exit 126
+EOF
+    chmod +x "$TEST_DIR/$cmd_name"
+}
+
+# Create mock npm with package installed and package.json structure for diagnostics
+# Usage: create_mock_npm_with_package_structure "claude" "@anthropic-ai/claude-code"
+create_mock_npm_with_package_structure() {
+    local cmd_name="$1"
+    local package_name="$2"
+
+    # Create mock npm root directory structure
+    local mock_npm_root="$TEST_DIR/node_modules"
+    local pkg_dir="$mock_npm_root/$package_name"
+    mkdir -p "$pkg_dir/bin"
+
+    # Create package.json
+    cat > "$pkg_dir/package.json" << EOF
+{
+  "name": "$package_name",
+  "version": "1.0.0",
+  "bin": {
+    "$cmd_name": "bin/$cmd_name.js"
+  }
+}
+EOF
+
+    # Create binary file
+    cat > "$pkg_dir/bin/$cmd_name.js" << EOF
+#!/usr/bin/env node
+console.log('Mock $cmd_name binary');
+EOF
+    chmod +x "$pkg_dir/bin/$cmd_name.js"
+
+    # Create mock npm that returns the correct root path
+    cat > "$TEST_DIR/npm" << EOF
+#!/bin/bash
+if [[ "\$1" == "root" && "\$2" == "-g" ]]; then
+    echo "$mock_npm_root"
+elif [[ "\$1" == "prefix" && "\$2" == "-g" ]]; then
+    echo "$TEST_DIR"
+elif [[ "\$1" == "list" && "\$2" == "-g" && "\$3" == "$package_name" ]]; then
+    exit 0  # Package is installed
+fi
+exit 0
+EOF
+    chmod +x "$TEST_DIR/npm"
+}
+
 # Get package name for a command
 get_package_name() {
     local cmd_name="$1"
@@ -167,6 +236,7 @@ get_package_name() {
         gemini) echo "@google/gemini-cli" ;;
         codex) echo "@openai/codex" ;;
         qwen) echo "@qwen-code/qwen-code" ;;
+        openspec) echo "@fission-ai/openspec" ;;
         *) echo "unknown-package" ;;
     esac
 }
@@ -179,6 +249,7 @@ get_min_node_version() {
         gemini) echo "20" ;;
         codex) echo "20" ;;
         qwen) echo "20" ;;
+        openspec) echo "20" ;;
         *) echo "18" ;;
     esac
 }

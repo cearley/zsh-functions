@@ -57,7 +57,29 @@ Provides shared functionality to reduce code duplication:
 - `_common_is_installed`: Checks if npm package is installed globally
 - `_common_prompt_install`: Handles user prompts for package installation
 - `_common_install_package`: Installs npm packages globally with error handling
-- `_common_run_command`: Executes commands with proper error handling
+- `_common_run_command`: Executes commands with intelligent error diagnostics and troubleshooting guidance
+
+**Enhanced Error Handling:**
+
+The library provides intelligent error diagnostics through:
+- `_common_diagnose_command_not_found`: Performs comprehensive diagnostics for exit code 127
+  - Checks package directory existence
+  - Validates package.json presence
+  - Verifies binary file location
+  - Inspects npm global bin symlinks
+- `_common_format_error_message`: Provides contextual error messages and troubleshooting steps for common exit codes:
+  - Exit 127: Command not found (includes full diagnostics and reinstall instructions)
+  - Exit 126: Permission denied (executable permissions guidance)
+  - Exit 1: Generic failure (general troubleshooting steps)
+  - Exit 2: Invalid arguments (syntax help)
+  - Exit 130: User interruption (Ctrl+C)
+  - Other codes: General troubleshooting guidance
+
+Error messages include:
+- Clear cause identification
+- Actionable troubleshooting steps with specific commands
+- Package-specific diagnostic information
+- Structured output with visual indicators (✓/✗)
 
 **Library Loading Strategy:**
 

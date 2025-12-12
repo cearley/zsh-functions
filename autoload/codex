@@ -46,7 +46,7 @@ codex() {
     fi
 
     # Run the actual codex command with all passed arguments and handle errors
-    _common_run_command "codex" "$@"
+    _common_run_command "codex" "$codex_pkg" "$@"
 }
 
 # Run the function with the current arguments.

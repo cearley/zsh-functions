@@ -46,7 +46,7 @@ openspec() {
     fi
 
     # Run the actual openspec command with all passed arguments and handle errors
-    _common_run_command "openspec" "$@"
+    _common_run_command "openspec" "$openspec_pkg" "$@"
 }
 
 # Run the function with the current arguments.

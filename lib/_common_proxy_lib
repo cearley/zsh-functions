@@ -82,19 +82,201 @@ _common_install_package() {
     fi
 }
 
-# Run command with proper error handling
-# Usage: _common_run_command <command_name> <...args>
+# Diagnose exit code 127 (command not found) and provide detailed troubleshooting
+# Usage: _common_diagnose_command_not_found <command_name> <package_name>
+_common_diagnose_command_not_found() {
+    local cmd_name="$1"
+    local pkg_name="$2"
+    local npm_root
+    local pkg_dir
+    local pkg_json
+    local bin_path
+
+    # Run diagnostics quietly
+    npm_root=$(npm root -g 2>/dev/null)
+    pkg_dir="$npm_root/$pkg_name"
+    pkg_json="$pkg_dir/package.json"
+
+    echo "" >&2
+    echo "Diagnostic Information:" >&2
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+
+    # Check 1: Package directory exists
+    if [[ -d "$pkg_dir" ]]; then
+        echo "✓ Package directory exists: $pkg_dir" >&2
+    else
+        echo "✗ Package directory not found: $pkg_dir" >&2
+        echo "  → The package may not be installed correctly" >&2
+        return 0
+    fi
+
+    # Check 2: package.json exists
+    if [[ -f "$pkg_json" ]]; then
+        echo "✓ Package manifest found: package.json" >&2
+    else
+        echo "✗ Package manifest missing: package.json" >&2
+        echo "  → The package installation appears corrupted" >&2
+        return 0
+    fi
+
+    # Check 3: Binary path from package.json
+    if command -v node >/dev/null 2>&1; then
+        # Extract bin path from package.json using node
+        bin_path=$(node -e "const pkg = require('$pkg_json'); const bin = pkg.bin; console.log(typeof bin === 'string' ? bin : (bin && bin['$cmd_name']) || 'not-found');" 2>/dev/null)
+
+        if [[ "$bin_path" != "not-found" && "$bin_path" != "undefined" ]]; then
+            local full_bin_path="$pkg_dir/$bin_path"
+            if [[ -f "$full_bin_path" ]]; then
+                echo "✓ Binary file exists: $bin_path" >&2
+            else
+                echo "✗ Binary file missing: $bin_path" >&2
+                echo "  → Expected at: $full_bin_path" >&2
+            fi
+        else
+            echo "✗ Binary entry not found in package.json" >&2
+        fi
+    fi
+
+    # Check 4: npm global bin directory
+    if command -v npm >/dev/null 2>&1; then
+        local npm_prefix
+        npm_prefix=$(npm prefix -g 2>/dev/null)
+        if [[ -n "$npm_prefix" ]]; then
+            local expected_symlink="$npm_prefix/bin/$cmd_name"
+            if [[ -L "$expected_symlink" ]] || [[ -f "$expected_symlink" ]]; then
+                echo "✓ Command symlink exists in global bin" >&2
+            else
+                echo "✗ Command symlink missing: $expected_symlink" >&2
+                echo "  → npm may have failed to create the bin link" >&2
+            fi
+        fi
+    fi
+
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+}
+
+# Format error messages based on exit code with specific troubleshooting guidance
+# Usage: _common_format_error_message <exit_code> <command_name> <package_name>
+_common_format_error_message() {
+    local exit_code="$1"
+    local cmd_name="$2"
+    local pkg_name="$3"
+
+    # Capitalize command name for display
+    local first_char="${cmd_name:0:1}"
+    local rest_chars="${cmd_name:1}"
+    local capitalized_cmd="${(U)first_char}${rest_chars}"
+
+    echo "" >&2
+    echo "Error: $capitalized_cmd command failed with exit code $exit_code" >&2
+
+    case "$exit_code" in
+        127)
+            # Command not found - most critical for our use case
+            echo "" >&2
+            echo "Cause: Command '$cmd_name' not found in PATH" >&2
+            echo "" >&2
+
+            # Run diagnostics if package name provided
+            if [[ -n "$pkg_name" ]]; then
+                _common_diagnose_command_not_found "$cmd_name" "$pkg_name"
+            fi
+
+            echo "" >&2
+            echo "Troubleshooting Steps:" >&2
+            echo "1. Reinstall the package to fix potential corruption:" >&2
+            echo "   npm uninstall -g $pkg_name" >&2
+            echo "   npm install -g $pkg_name" >&2
+            echo "" >&2
+            echo "2. Verify npm global bin is in your PATH:" >&2
+            echo "   echo \$PATH | grep \$(npm prefix -g)/bin" >&2
+            echo "" >&2
+            echo "3. Check npm configuration:" >&2
+            echo "   npm config get prefix" >&2
+            echo "   npm list -g --depth=0 | grep $pkg_name" >&2
+            ;;
+
+        126)
+            # Permission denied
+            echo "" >&2
+            echo "Cause: Permission denied executing '$cmd_name'" >&2
+            echo "" >&2
+            echo "Troubleshooting Steps:" >&2
+            echo "1. Check executable permissions:" >&2
+            echo "   which $cmd_name" >&2
+            echo "   ls -l \$(which $cmd_name)" >&2
+            echo "" >&2
+            echo "2. Reinstall the package with proper permissions:" >&2
+            echo "   npm uninstall -g $pkg_name" >&2
+            echo "   npm install -g $pkg_name" >&2
+            echo "" >&2
+            echo "3. If using nvm or similar, ensure proper setup:" >&2
+            echo "   nvm current" >&2
+            ;;
+
+        1)
+            # Generic failure - command executed but failed
+            echo "" >&2
+            echo "Cause: Command executed but returned an error" >&2
+            echo "" >&2
+            echo "Troubleshooting Steps:" >&2
+            echo "1. Check the command output above for specific error details" >&2
+            echo "2. Verify command syntax: $cmd_name --help" >&2
+            echo "3. Check for required configuration or authentication" >&2
+            echo "4. Try running with verbose/debug flags if available" >&2
+            ;;
+
+        2)
+            # Misuse of shell command
+            echo "" >&2
+            echo "Cause: Incorrect command usage or invalid arguments" >&2
+            echo "" >&2
+            echo "Troubleshooting Steps:" >&2
+            echo "1. Check command syntax: $cmd_name --help" >&2
+            echo "2. Verify all required arguments are provided" >&2
+            echo "3. Check for invalid flags or options" >&2
+            ;;
+
+        130)
+            # Terminated by Ctrl+C
+            echo "" >&2
+            echo "Cause: Command interrupted by user (Ctrl+C)" >&2
+            ;;
+
+        *)
+            # Unknown exit code - provide general guidance
+            echo "" >&2
+            echo "Cause: Unknown error condition" >&2
+            echo "" >&2
+            echo "Troubleshooting Steps:" >&2
+            echo "1. Check the command output above for specific error details" >&2
+            echo "2. Run with debug/verbose flags: $cmd_name --help" >&2
+            echo "3. Verify package installation: npm list -g $pkg_name" >&2
+            echo "4. Check package documentation for exit code meanings" >&2
+            ;;
+    esac
+
+    echo "" >&2
+}
+
+# Run command with proper error handling and intelligent diagnostics
+# Provides contextual error messages and troubleshooting steps based on exit codes
+# Usage: _common_run_command <command_name> <package_name> <...args>
 _common_run_command() {
     local cmd_name="$1"
-    shift
+    local pkg_name="$2"
+    shift 2
+
+    # Execute the command with all remaining arguments
     command "$cmd_name" "$@"
     local exit_code=$?
-    if [[ $exit_code -ne 0 ]]; then
-        # Capitalize the first letter of the command name for the error message
-        local first_char="${cmd_name:0:1}"
-        local rest_chars="${cmd_name:1}"
-        local capitalized_cmd_name="${(U)first_char}${rest_chars}"
-        echo "Error: $capitalized_cmd_name command failed with exit code $exit_code" >&2
-        return $exit_code
+
+    # If command succeeded, return immediately
+    if [[ $exit_code -eq 0 ]]; then
+        return 0
     fi
+
+    # Command failed - provide intelligent error handling
+    _common_format_error_message "$exit_code" "$cmd_name" "$pkg_name"
+    return $exit_code
 }
