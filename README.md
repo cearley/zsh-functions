@@ -1,26 +1,56 @@
 # Zsh Functions Collection
 
 [![CI](https://github.com/cearley/zsh_functions/actions/workflows/ci.yml/badge.svg)](https://github.com/cearley/zsh_functions/actions)
-![Shell](https://img.shields.io/badge/shell-zsh-blue.svg)
-![Node.js](https://img.shields.io/badge/node.js-18%2B-green.svg)
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)
-[![GitHub last commit](https://img.shields.io/github/last-commit/cearley/zsh_functions)](https://github.com/cearley/zsh_functions/commits)
+[![GitHub release](https://img.shields.io/github/v/release/cearley/zsh_functions)](https://github.com/cearley/zsh_functions/releases)
 
-A collection of useful zsh shell functions with comprehensive testing.
+A collection of useful zsh shell functions.
 
 ## Available Functions
 
-- **[claude](#claude)** - Transparent proxy to the `@anthropic-ai/claude-code` npm package
-- **[codex](#codex)** - Transparent proxy to the `@openai/codex` npm package
-- **[gemini](#gemini)** - Transparent proxy to the `@google/gemini-cli` npm package
-- **[qwen](#qwen)** - Transparent proxy to the `@qwen-code/qwen-code` npm package
-- **[brew-list-formulas](#brew-list-formulas)** - Lists formulas from Homebrew taps
+The repository includes transparent proxy functions for various AI command-line tools:
+
+- **claude** - Transparent proxy to the `@anthropic-ai/claude-code` npm package
+- **codex** - Transparent proxy to the `@openai/codex` npm package
+- **gemini** - Transparent proxy to the `@google/gemini-cli` npm package
+- **qwen** - Transparent proxy to the `@qwen-code/qwen-code` npm package
+- **openspec** - Transparent proxy to the `@fission-ai/openspec` npm package
+
+And utility functions:
+
+- **brew-list-formulas** - Lists formulas from Homebrew taps
 
 
 ## Installation
 
 The `autoload/` directory contains **zsh autoloadable functions** - special shell functions that are loaded automatically by zsh when first called, rather than being loaded into memory immediately.
+
+### Using the Latest Release (Recommended)
+
+For most users, downloading the latest release instead of cloning the development branch is recommended:
+
+1. **Go to the [Releases page](https://github.com/cearley/zsh_functions/releases) and download the latest release archive (tar.gz or zip)**
+
+2. **Extract the archive and move to a preferred location:**
+   ```bash
+   tar -xzf zsh_functions-*.tar.gz
+   mv zsh_functions-* ~/.zsh-functions
+   ```
+
+3. **Add autoload functions to your `~/.zshrc`:**
+   ```bash
+   # Add zsh-functions to fpath and autoload all functions
+   fpath=("$HOME/.zsh-functions/autoload" $fpath)
+   autoload -Uz $HOME/.zsh-functions/autoload/*
+   ```
+
+4. **Reload your shell:**
+   ```bash
+   source ~/.zshrc
+   ```
+
+### Using the Development Version
+
+If you want to use the latest development version or contribute to the project:
 
 1. **Clone the repository:**
    ```bash
@@ -35,7 +65,7 @@ The `autoload/` directory contains **zsh autoloadable functions** - special shel
    ```
 
 3. **Reload your shell:**
-   ```bash 
+   ```bash
    source ~/.zshrc
    ```
 
@@ -46,7 +76,7 @@ Tests use [Bats testing framework](https://github.com/bats-core/bats-core):
 # Install Bats
 brew install bats-core
 
-# Run all tests (57 tests total)
+# Run all tests
 bats tests/unit/ tests/integration/
 
 # Run specific test types
@@ -67,44 +97,24 @@ Available tasks (Cmd+Shift+P → "Tasks: Run Task"):
 2. Follow zsh function conventions:
    ```bash
    #!/usr/bin/env zsh
-   
+
    # Source common library if needed (for proxy functions)
    # source "${0:A:h}/../lib/_common_proxy_lib" 2>/dev/null || {
    #     echo "Error: Could not load common proxy library." >&2
    #     return 1
    # }
-   
+
    # Function description
    function_name() {
        # Implementation
    }
-   
+
    # Auto-execute if called directly
    function_name "$@"
    ```
 
 3. Make executable: `chmod +x autoload/function_name`
 4. Test: `bats tests/`
-
-## Project Structure
-
-```
-├── autoload/              # Zsh autoloadable function files (loaded when first called)
-│   ├── claude             # Claude AI proxy
-│   ├── codex              # Codex AI proxy
-│   ├── gemini             # Gemini AI proxy
-│   ├── qwen               # Qwen AI proxy
-│   ├── brew-list-formulas # Homebrew utility
-│   └── hello              # Demo function
-├── lib/                   # Shared library files
-│   └── _common_proxy_lib  # Common functionality for AI proxies
-├── tests/                 # Test suite
-│   ├── unit/              # Unit tests
-│   ├── integration/       # Integration tests
-│   └── helpers.bash       # Test utilities
-├── .vscode/               # VS Code configuration
-└── README.md             # This file
-```
 
 ## Requirements
 
@@ -115,90 +125,47 @@ Available tasks (Cmd+Shift+P → "Tasks: Run Task"):
 
 ## Functions
 
-### claude
-Transparent proxy to the `@anthropic-ai/claude-code` npm package. Automatically handles installation and setup.
+The repository includes transparent proxy functions for various AI command-line tools and utilities. These functions automatically handle dependency installation and management, acting as seamless wrappers around the actual CLI tools.
 
-**Features:**
-- Checks for Node.js (≥18) and npm
-- Prompts to install package if missing
-- Passes all arguments to the actual claude command
+### Example: gemini
+As an example, the `gemini` function is a transparent proxy to the `@google/gemini-cli` npm package:
 
-**Usage:**
-```bash
-claude "Write a hello world function"
-```
-
-### codex
-Transparent proxy to the `@openai/codex` npm package. Automatically handles installation and setup.
-
-**Features:**
-- Checks for Node.js (≥20) and npm
-- Prompts to install package if missing
-- Passes all arguments to the actual codex command
-
-**Usage:**
-```bash
-codex "Write a function to parse JSON"
-codex --model code-davinci-002 "Generate unit tests"
-```
-
-### gemini
-Transparent proxy to the `@google/gemini-cli` npm package. Automatically handles installation and setup.
-
-**Features:**
-- Checks for Node.js (≥20) and npm
-- Prompts to install package if missing
-- Passes all arguments to the actual gemini command
-
-**Usage:**
 ```bash
 gemini "Explain the architecture of this codebase"
 gemini -m gemini-2.5-flash "Generate tests for this function"
 ```
 
-### qwen
-Transparent proxy to the `@qwen-code/qwen-code` npm package. Automatically handles installation and setup.
+**How Transparent Proxies Work:**
+These functions are called 'transparent proxies' because they automatically check for and install the required npm packages (like `@google/gemini-cli`) the first time you use them. This is especially helpful for developers who use multiple Node.js environments (for example, with nvm or asdf), where global npm packages might not always be available in every environment.
 
-**Features:**
-- Checks for Node.js (≥20) and npm
-- Prompts to install package if missing
-- Passes all arguments to the actual qwen command
+**Key Benefits:**
+- **Automatic Setup**: No need to manually install or update CLI tools
+- **Environment Consistency**: Works across different Node.js versions and environments
+- **Seamless Experience**: Functions work identically to the original CLI tools
 
-**Usage:**
-```bash
-qwen "Refactor this code for better performance"
-qwen --help
-```
+**Possible Considerations:**
+- First use may be slower if packages need installation
+- Packages may be installed multiple times across different environments
+- Automatic installation might not suit all production environments
 
-### brew-list-formulas
-Lists formulas from Homebrew taps.
+For most developers, this approach provides a convenient, environment-agnostic way to access AI CLI tools without worrying about setup or dependency management.
 
-**Usage:**
-```bash
-# List all taps
-brew-list-formulas
+## Release Process
 
-# List formulas from specific tap
-brew-list-formulas homebrew/core
+To create a new release of this project:
 
-# List from multiple taps
-brew-list-formulas tap1/name tap2/name
-```
+1. Go to the **Actions** tab in the GitHub repository
+2. Select the **Create Release** workflow from the list
+3. Click the **Run workflow** button
+4. Choose the version type (major, minor, or patch) according to semantic versioning
+5. Optionally provide a custom tag name if you don't want to use semantic versioning
+6. Click **Run workflow** to trigger the release process
 
-### Note on AI proxy functions (claude, codex, gemini, qwen)
-These functions are called 'transparent proxies' because they automatically check for and install the required npm packages (like `@anthropic-ai/claude-code`, `@openai/codex`, `@google/gemini-cli`, or `@qwen-code/qwen-code`) the first time you use them. This is especially helpful for developers who use multiple Node.js environments (for example, with nvm or asdf), where global npm packages might not always be available in every environment.
-
-**Advantages:**
-- You don't have to manually install or update the CLI tools—they are installed for you if missing.
-- You always get a working command, even if you switch Node.js versions or environments.
-- The proxy functions work just like the real CLI tools, so you can use them the same way.
-
-**Possible disadvantages:**
-- The first run may be slower if the package needs to be installed.
-- If you use many different Node.js environments, the package may be installed multiple times (once per environment).
-- Automatic installation may not be desirable in some locked-down or production environments.
-
-For most developers, this approach makes it much more convenient to use these tools without worrying about setup or environment issues.
+The workflow will:
+- Automatically bump the version number
+- Generate release notes based on commit messages since the last release
+- Create a new Git tag
+- Create a GitHub Release with the changelog entries
 
 ## License
 
