@@ -37,9 +37,15 @@ For most users, downloading the latest release instead of cloning the developmen
 
 3. **Add autoload functions to your `~/.zshrc`:**
    ```bash
-   # Add zsh-functions to fpath and autoload all functions
-   fpath=("$HOME/.zsh-functions/autoload" $fpath)
-   autoload -Uz $HOME/.zsh-functions/autoload/*
+   # Add zsh-functions to fpath
+   fpath=("$HOME/.zsh-functions/autoload" "${fpath[@]}")
+
+   # Autoload all functions (default behavior)
+   autoload -Uz *
+
+   # OR, to selectively exclude functions (e.g., if you have native installations):
+   # autoload -Uz gemini qwen openspec brew-list-formulas
+   # (excluding codex in this example since user has it via Homebrew)
    ```
 
 4. **Reload your shell:**
@@ -58,9 +64,15 @@ If you want to use the latest development version or contribute to the project:
 
 2. **Add autoload functions to your `~/.zshrc`:**
    ```bash
-   # Add zsh-functions to fpath and autoload all functions
+   # Add zsh-functions to fpath
    fpath=("$HOME/.zsh-functions/autoload" $fpath)
-   autoload -Uz $HOME/.zsh-functions/autoload/*
+
+   # Autoload all functions (default behavior)
+   autoload -Uz *
+
+   # OR, to selectively exclude functions (e.g., if you have native installations):
+   # autoload -Uz gemini qwen openspec brew-list-formulas
+   # (excluding codex in this example since user has it via Homebrew)
    ```
 
 3. **Reload your shell:**

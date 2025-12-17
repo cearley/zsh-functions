@@ -101,9 +101,15 @@ The common library provides enhanced error handling with contextual diagnostics 
 
 2. Add to your `~/.zshrc`:
    ```bash
-   # Add zsh-functions to fpath and autoload all functions
-   fpath=("$HOME/.zsh-functions/autoload" $fpath)
-   autoload -Uz $HOME/.zsh-functions/autoload/*
+   # Add zsh-functions to fpath
+   fpath=("$HOME/.zsh-functions/autoload" "${fpath[@]}")
+
+   # Autoload all functions (default behavior)
+   autoload -Uz *
+
+   # OR, to selectively exclude functions (e.g., if you have native installations):
+   # autoload -Uz gemini qwen openspec brew-list-formulas
+   # (excluding codex in this example since user has it via Homebrew)
    ```
 
 3. Reload your shell:

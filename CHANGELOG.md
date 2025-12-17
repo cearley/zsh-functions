@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Improved fpath syntax in README and documentation to use proper array handling with "${fpath[@]}"
+- Clarified function exclusion approach to use individual autoload commands
+- Updated installation instructions to reflect correct zsh autoloading syntax
+
 ## [1.0.0] - 2025-12-17
 
 ### Added
