@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - 2025-01-01
+## [1.0.0] - 2025-12-17
 
 ### Added
 - Initial release of zsh functions collection
@@ -19,9 +19,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Common proxy library for shared functionality
 - Comprehensive integration tests
 - Documentation and usage guides
-
-### Removed
-- Claude AI proxy function (now available through native installation)
 
 ### Changed
 - Project structure with autoload/ and lib/ directories
@@ -35,12 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Shellcheck compliance
 - Proper error handling with exit codes
 - Security warnings for package installations
-
-### Deprecated
-- None
-
-### Removed
-- None
 
 ### Security
 - Added security notices for npm package installations
