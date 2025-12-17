@@ -36,7 +36,8 @@ The project is structured around zsh autoloadable functions that are loaded dyna
 │   ├── gemini             # Gemini AI proxy
 │   ├── qwen               # Qwen AI proxy
 │   ├── openspec           # OpenSpec AI proxy
-│   ├── brew-list-formulas # Homebrew utility
+│   └── brew-list-formulas # Homebrew utility
+├── examples/              # Example function templates
 │   └── hello              # Demo function
 ├── lib/                   # Shared library files
 │   └── _common_proxy_lib  # Common functionality for AI proxies
@@ -126,7 +127,8 @@ brew-list-formulas
 This is a zsh functions collection with a modular, autoloadable design. Each function in `autoload/` is self-contained and follows zsh autoloading conventions.
 
 **Core Structure:**
-- `autoload/` - Autoloadable zsh function files (codex, gemini, qwen, openspec, brew-list-formulas, hello)
+- `autoload/` - Autoloadable zsh function files (codex, gemini, qwen, openspec, brew-list-formulas)
+- `examples/` - Example function templates (hello)
 - `lib/` - Shared library files
   - `_common_proxy_lib` - Common functionality for AI proxy functions
 - `tests/` - Test suite including integration and unit tests
