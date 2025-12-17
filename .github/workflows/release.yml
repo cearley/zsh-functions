@@ -17,6 +17,10 @@ on:
         required: false
         type: string
 
+permissions:
+  contents: write
+  pull-requests: write
+
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -72,18 +76,17 @@ jobs:
 
       - name: Create GitHub Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ env.NEW_TAG }}
-          release_name: Release ${{ env.NEW_TAG }}
+          tag: ${{ env.NEW_TAG }}
+          name: Release ${{ env.NEW_TAG }}
           body: |
             ## Changes in this release
 
             ${{ steps.release_notes.outputs.commits }}
 
             For full details, see the [CHANGELOG.md](./CHANGELOG.md) file.
-          draft: false
-          prerelease: false
+          makeLatest: true
 
       - name: Commit and push changes
         run: |
