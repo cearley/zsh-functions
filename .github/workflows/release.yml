@@ -1,0 +1,96 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version type for semantic versioning'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+      custom_tag:
+        description: 'Custom tag (optional, will override semantic versioning)'
+        required: false
+        type: string
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all tags and branches
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install standard-version
+        run: npm install --save-dev standard-version
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Bump version and update changelog
+        run: |
+          if [ -n "${{ inputs.custom_tag }}" ]; then
+            # Use custom tag if provided
+            npm version ${{ inputs.custom_tag }} --no-git-tag-version
+            NEW_TAG=${{ inputs.custom_tag }}
+          else
+            # Use semantic versioning based on input
+            npm version ${{ inputs.version_type }} --no-git-tag-version
+            NEW_TAG="v$(node -p "require('./package.json').version")"
+          fi
+          
+          # Use standard-version to update changelog and create git tag
+          npx standard-version --release-as $NEW_TAG
+          
+          # Store the new tag for the next step
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+
+      - name: Get commit messages for release notes
+        id: release_notes
+        run: |
+          # Get commit messages since last tag (or all commits if this is the first tag)
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-parents=0 HEAD)
+          COMMIT_MESSAGES=$(git log --oneline --no-merges $LAST_TAG..HEAD | sed 's/^/    - /')
+          echo "commits<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMIT_MESSAGES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ env.NEW_TAG }}
+          release_name: Release ${{ env.NEW_TAG }}
+          body: |
+            ## Changes in this release
+
+            ${{ steps.release_notes.outputs.commits }}
+
+            For full details, see the [CHANGELOG.md](./CHANGELOG.md) file.
+          draft: false
+          prerelease: false
+
+      - name: Commit and push changes
+        run: |
+          git push origin main
+          git push origin ${{ env.NEW_TAG }}
+
+      - name: Verify release creation
+        run: |
+          echo "Release created with tag: ${{ env.NEW_TAG }}"
+          echo "Release URL: ${{ steps.create_release.outputs.html_url }}"
