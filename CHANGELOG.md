@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved fpath syntax in README and documentation to use proper array handling with "${fpath[@]}"
 - Clarified function exclusion approach to use individual autoload commands
 - Updated installation instructions to reflect correct zsh autoloading syntax
+- Update release workflow to use ncipollo/release-action
 
 ## [1.0.0] - 2025-12-17
 
