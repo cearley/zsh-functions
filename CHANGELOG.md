@@ -27,6 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project structure with autoload/ and lib/ directories
 - Implementation using zsh autoloadable functions
 - Shared library approach for common functionality
+- Moved hello example function from autoload/ to examples/ directory
+- Updated TESTING_STRATEGY.md to clarify it's for AI agents
+- Removed pronouns from CONTRIBUTING.md
 
 ### Fixed
 - Shellcheck compliance
