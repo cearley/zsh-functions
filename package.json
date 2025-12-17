@@ -1,6 +1,6 @@
 {
   "name": "zsh-functions",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A collection of useful zsh shell functions that serve as transparent proxies for various AI command-line tools and other utilities",
   "main": "index.js",
   "scripts": {

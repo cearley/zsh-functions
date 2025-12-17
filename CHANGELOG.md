@@ -1,18 +1,8 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
-
-### Changed
-- Improved fpath syntax in README and documentation to use proper array handling with "${fpath[@]}"
-- Clarified function exclusion approach to use individual autoload commands
-- Updated installation instructions to reflect correct zsh autoloading syntax
-- Update release workflow to use ncipollo/release-action
-- Fix release workflow to push to 'master' branch instead of 'main'
+### [1.0.1](https://github.com/cearley/zsh_functions/compare/v1.0.0...v1.0.1) (2025-12-17)
 
 ## [1.0.0] - 2025-12-17
 
