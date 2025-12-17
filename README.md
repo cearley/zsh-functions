@@ -9,7 +9,6 @@ A collection of useful zsh shell functions.
 
 The repository includes transparent proxy functions for various AI command-line tools:
 
-- **claude** - Transparent proxy to the `@anthropic-ai/claude-code` npm package
 - **codex** - Transparent proxy to the `@openai/codex` npm package
 - **gemini** - Transparent proxy to the `@google/gemini-cli` npm package
 - **qwen** - Transparent proxy to the `@qwen-code/qwen-code` npm package
@@ -87,9 +86,10 @@ bats tests/integration/ # Integration tests only
 ### VS Code Development
 Available tasks (Cmd+Shift+P → "Tasks: Run Task"):
 - **Run All Tests (Bats)** - Execute full test suite
-- **Sync to ~/.zfunc** - Copy functions to zsh directory
 - **Make Functions Executable** - Set proper permissions
 - **Validate Shell Scripts** - Run shellcheck
+- **Run Unit Tests (Bats)** - Execute unit test suite
+- **Run Integration Tests (Bats)** - Execute integration test suite
 
 ### Adding New Functions
 
@@ -120,7 +120,6 @@ Available tasks (Cmd+Shift+P → "Tasks: Run Task"):
 
 - **Zsh shell**
 - **Bats** (for testing): `brew install bats-core`
-- **Node.js ≥18** (for claude function)
 - **Node.js ≥20** (for codex, gemini, and qwen functions)
 
 ## Functions
@@ -136,7 +135,7 @@ gemini -m gemini-2.5-flash "Generate tests for this function"
 ```
 
 **How Transparent Proxies Work:**
-These functions are called 'transparent proxies' because they automatically check for and install the required npm packages (like `@google/gemini-cli`) the first time you use them. This is especially helpful for developers who use multiple Node.js environments (for example, with nvm or asdf), where global npm packages might not always be available in every environment.
+These functions are called 'transparent proxies' because they automatically check for and install the required npm packages (like `@google/gemini-cli`, `@openai/codex`, `@qwen-code/qwen-code`, or `@fission-ai/openspec`) the first time you use them. This is especially helpful for developers who use multiple Node.js environments (for example, with nvm or asdf), where global npm packages might not always be available in every environment.
 
 **Key Benefits:**
 - **Automatic Setup**: No need to manually install or update CLI tools

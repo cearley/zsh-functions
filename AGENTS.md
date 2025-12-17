@@ -32,7 +32,6 @@ The project is structured around zsh autoloadable functions that are loaded dyna
 
 ```
 ├── autoload/              # Zsh autoloadable function files (loaded when first called)
-│   ├── claude             # Claude AI proxy
 │   ├── codex              # Codex AI proxy
 │   ├── gemini             # Gemini AI proxy
 │   ├── qwen               # Qwen AI proxy
@@ -56,7 +55,6 @@ The project is structured around zsh autoloadable functions that are loaded dyna
 ### AI Proxy Functions
 
 The core of the project consists of AI command proxy functions:
-- **claude**: Transparent proxy to `@anthropic-ai/claude-code` npm package (Node.js ≥18)
 - **codex**: Transparent proxy to `@openai/codex` npm package (Node.js ≥20)
 - **gemini**: Transparent proxy to `@google/gemini-cli` npm package (Node.js ≥20)
 - **qwen**: Transparent proxy to `@qwen-code/qwen-code` npm package (Node.js ≥20)
@@ -116,7 +114,6 @@ The common library provides enhanced error handling with contextual diagnostics 
 
 After installation, the functions are available directly from the command line:
 ```bash
-claude "Write a hello world function"
 codex "Write a function to parse JSON"
 gemini "Explain the architecture of this codebase"
 qwen "Refactor this code for better performance"
@@ -129,7 +126,7 @@ brew-list-formulas
 This is a zsh functions collection with a modular, autoloadable design. Each function in `autoload/` is self-contained and follows zsh autoloading conventions.
 
 **Core Structure:**
-- `autoload/` - Autoloadable zsh function files (claude, codex, gemini, qwen, openspec, brew-list-formulas, hello)
+- `autoload/` - Autoloadable zsh function files (codex, gemini, qwen, openspec, brew-list-formulas, hello)
 - `lib/` - Shared library files
   - `_common_proxy_lib` - Common functionality for AI proxy functions
 - `tests/` - Test suite including integration and unit tests
@@ -140,8 +137,7 @@ This is a zsh functions collection with a modular, autoloadable design. Each fun
 
 **AI Proxy Functions:**
 
-The core AI proxy functions (claude, codex, gemini, qwen, openspec) are transparent wrappers around npm packages:
-- **claude**: `@anthropic-ai/claude-code` (Node.js ≥18)
+The core AI proxy functions (codex, gemini, qwen, openspec) are transparent wrappers around npm packages:
 - **codex**: `@openai/codex` (Node.js ≥20)
 - **gemini**: `@google/gemini-cli` (Node.js ≥20)
 - **qwen**: `@qwen-code/qwen-code` (Node.js ≥20)
@@ -203,9 +199,9 @@ fi
 
 **How it works:**
 
-1. **Autoloaded functions** (primary use case): When a function is autoloaded via `fpath`, `$0` contains just the function name (e.g., `claude`), and `${0:A}` resolves to `$PWD/$0` (current working directory + function name), not the actual file path. The `functions_source` array from the `zsh/parameter` module provides the actual source file path, enabling reliable library loading regardless of the current working directory.
+1. **Autoloaded functions** (primary use case): When a function is autoloaded via `fpath`, `$0` contains just the function name (e.g., `qwen`), and `${0:A}` resolves to `$PWD/$0` (current working directory + function name), not the actual file path. The `functions_source` array from the `zsh/parameter` module provides the actual source file path, enabling reliable library loading regardless of the current working directory.
 
-2. **Direct execution and symlinks** (fallback): When the script is executed directly (e.g., `./autoload/claude`) or via symlink, `$functions_source` is not set. The `${0:A:h}` expansion resolves the absolute path (following symlinks via `:A`), allowing the library to be found relative to the script location.
+2. **Direct execution and symlinks** (fallback): When the script is executed directly (e.g., `./autoload/qwen`) or via symlink, `$functions_source` is not set. The `${0:A:h}` expansion resolves the absolute path (following symlinks via `:A`), allowing the library to be found relative to the script location.
 
 **Function Architecture Pattern:**
 Each function follows this structure:
@@ -250,7 +246,6 @@ function_name "$@"
 
 - **Zsh shell**
 - **Bats** (for testing): `brew install bats-core`
-- **Node.js ≥18** (for claude function)
 - **Node.js ≥20** (for codex, gemini, qwen, and openspec functions)
 
 ### Testing
@@ -381,7 +376,6 @@ When contributing to this project:
 - Bats testing framework for development (`brew install bats-core`)
 
 **Function-specific dependencies:**
-- `claude`: Node.js ≥18, npm (auto-managed by the function)
 - `codex`: Node.js ≥20, npm (auto-managed by the function)
 - `gemini`: Node.js ≥20, npm (auto-managed by the function)
 - `qwen`: Node.js ≥20, npm (auto-managed by the function)

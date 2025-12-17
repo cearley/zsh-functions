@@ -11,8 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Initial release of zsh functions collection
-- Claude AI proxy function
-- Codex AI proxy function  
+- Codex AI proxy function
 - Gemini AI proxy function
 - Qwen AI proxy function
 - OpenSpec AI proxy function
@@ -20,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Common proxy library for shared functionality
 - Comprehensive integration tests
 - Documentation and usage guides
+
+### Removed
+- Claude AI proxy function (now available through native installation)
 
 ### Changed
 - Project structure with autoload/ and lib/ directories
