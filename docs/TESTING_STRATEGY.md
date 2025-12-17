@@ -1,6 +1,6 @@
-# Testing Strategy
+# Testing Strategy for AI Agents
 
-This document outlines the testing philosophy and strategy for the zsh-functions repository, including the analysis that led to our current approach and guidelines for future development.
+This document outlines the testing philosophy and strategy for the zsh-functions repository, intended for AI agents working with this codebase. It includes the analysis that led to our current approach and guidelines for future development.
 
 ## Executive Summary
 

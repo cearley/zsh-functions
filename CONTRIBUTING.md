@@ -1,6 +1,6 @@
 # Contributing to zsh_functions
 
-We welcome contributions to the zsh_functions project! Here's how you can help.
+Contributions to the zsh_functions project are welcome! Here's how to help.
 
 ## Commit Message Format
 
