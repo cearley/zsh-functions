@@ -90,7 +90,7 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git push origin main
+          git push origin master
           git push origin ${{ env.NEW_TAG }}
 
       - name: Verify release creation

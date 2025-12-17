@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Clarified function exclusion approach to use individual autoload commands
 - Updated installation instructions to reflect correct zsh autoloading syntax
 - Update release workflow to use ncipollo/release-action
+- Fix release workflow to push to 'master' branch instead of 'main'
 
 ## [1.0.0] - 2025-12-17
 
