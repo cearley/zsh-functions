@@ -1,7 +1,7 @@
 # Zsh Functions Collection
 
-[![CI](https://github.com/cearley/zsh_functions/actions/workflows/ci.yml/badge.svg)](https://github.com/cearley/zsh_functions/actions)
-[![GitHub release](https://img.shields.io/github/v/release/cearley/zsh_functions)](https://github.com/cearley/zsh_functions/releases)
+[![CI](https://github.com/cearley/zsh-functions/actions/workflows/ci.yml/badge.svg)](https://github.com/cearley/zsh-functions/actions)
+[![GitHub release](https://img.shields.io/github/v/release/cearley/zsh-functions)](https://github.com/cearley/zsh-functions/releases)
 
 A collection of useful zsh shell functions.
 
@@ -27,12 +27,12 @@ The `autoload/` directory contains **zsh autoloadable functions** - special shel
 
 For most users, downloading the latest release instead of cloning the development branch is recommended:
 
-1. **Go to the [Releases page](https://github.com/cearley/zsh_functions/releases) and download the latest release archive (tar.gz or zip)**
+1. **Go to the [Releases page](https://github.com/cearley/zsh-functions/releases) and download the latest release archive (tar.gz or zip)**
 
 2. **Extract the archive and move to a preferred location:**
    ```bash
-   tar -xzf zsh_functions-*.tar.gz
-   mv zsh_functions-* ~/.zsh-functions
+   tar -xzf zsh-functions-*.tar.gz
+   mv zsh-functions-* ~/.zsh-functions
    ```
 
 3. **Add autoload functions to your `~/.zshrc`:**

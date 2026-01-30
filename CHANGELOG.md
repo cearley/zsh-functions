@@ -49,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added security notices for npm package installations
 - Improved input validation for user responses
 
-[Unreleased]: https://github.com/cearley/zsh_functions/compare/v1.0.2...HEAD
-[1.0.2]: https://github.com/cearley/zsh_functions/compare/v1.0.1...v1.0.2
-[1.0.1]: https://github.com/cearley/zsh_functions/compare/v1.0.0...v1.0.1
-[1.0.0]: https://github.com/cearley/zsh_functions/releases/tag/v1.0.0
+[Unreleased]: https://github.com/cearley/zsh-functions/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/cearley/zsh-functions/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/cearley/zsh-functions/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/cearley/zsh-functions/releases/tag/v1.0.0
