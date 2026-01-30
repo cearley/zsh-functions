@@ -40,6 +40,9 @@ For most users, downloading the latest release instead of cloning the developmen
    # Add zsh-functions to fpath
    fpath=("$HOME/.zsh-functions/autoload" "${fpath[@]}")
 
+   # Optional: Set ZSH_FUNCTIONS_DIR for non-standard environments (e.g., Claude Code)
+   export ZSH_FUNCTIONS_DIR="$HOME/.zsh-functions"
+
    # Autoload all functions (default behavior)
    autoload -Uz *
 
@@ -65,7 +68,10 @@ If you want to use the latest development version or contribute to the project:
 2. **Add autoload functions to your `~/.zshrc`:**
    ```bash
    # Add zsh-functions to fpath
-   fpath=("$HOME/.zsh-functions/autoload" $fpath)
+   fpath=("$HOME/.zsh-functions/autoload" "${fpath[@]}")
+
+   # Optional: Set ZSH_FUNCTIONS_DIR for non-standard environments (e.g., Claude Code)
+   export ZSH_FUNCTIONS_DIR="$HOME/.zsh-functions"
 
    # Autoload all functions (default behavior)
    autoload -Uz *
@@ -159,24 +165,37 @@ These functions are called 'transparent proxies' because they automatically chec
 - Packages may be installed multiple times across different environments
 - Automatic installation might not suit all production environments
 
+**Non-Standard Environments (e.g., Claude Code):**
+If you encounter "Error: Could not load common proxy library" in environments where zsh autoload behaves differently, set the `ZSH_FUNCTIONS_DIR` environment variable in your `~/.zshrc`:
+```bash
+export ZSH_FUNCTIONS_DIR="$HOME/.zsh-functions"
+```
+
 For most developers, this approach provides a convenient, environment-agnostic way to access AI CLI tools without worrying about setup or dependency management.
 
 ## Release Process
 
-To create a new release of this project:
+To create a new release:
 
-1. Go to the **Actions** tab in the GitHub repository
-2. Select the **Create Release** workflow from the list
-3. Click the **Run workflow** button
-4. Choose the version type (major, minor, or patch) according to semantic versioning
-5. Optionally provide a custom tag name if you don't want to use semantic versioning
-6. Click **Run workflow** to trigger the release process
+1. **Update CHANGELOG.md:**
+   - Move items from `[Unreleased]` to a new version section (e.g., `## [1.0.2] - 2025-01-30`)
+   - Add the new version's comparison link at the bottom
+   - Update the `[Unreleased]` link to compare from the new version
 
-The workflow will:
-- Automatically bump the version number
-- Generate release notes based on commit messages since the last release
-- Create a new Git tag
-- Create a GitHub Release with the changelog entries
+2. **Commit the changelog:**
+   ```bash
+   git add CHANGELOG.md
+   git commit -m "docs: prepare release v1.0.2"
+   ```
+
+3. **Create and push the tag:**
+   ```bash
+   git tag v1.0.2
+   git push origin master
+   git push origin v1.0.2
+   ```
+
+4. **GitHub Actions automatically creates the release** with notes extracted from CHANGELOG.md
 
 ## License
 

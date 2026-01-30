@@ -28,6 +28,9 @@ The project is structured around zsh autoloadable functions that are loaded dyna
 - "Run All Tests (Bats)" - Execute full test suite
 - "Validate Shell Scripts" - Run shellcheck on all functions
 
+**Known IDE Warnings:**
+- ShellCheck errors on zsh scripts (line 1) are expected - ShellCheck only supports sh/bash/dash/ksh, not zsh
+
 ## Project Structure
 
 ```
@@ -198,7 +201,12 @@ if [[ ! -v sourced ]]; then
     source "${0:A:h}/../lib/_common_proxy_lib" 2>/dev/null && sourced=1
 fi
 
-# Error if both attempts fail
+# Third fallback: use ZSH_FUNCTIONS_DIR environment variable
+if [[ ! -v sourced && -n "$ZSH_FUNCTIONS_DIR" ]]; then
+    source "$ZSH_FUNCTIONS_DIR/lib/_common_proxy_lib" 2>/dev/null && sourced=1
+fi
+
+# Error if all attempts fail
 if [[ ! -v sourced ]]; then
     echo "Error: Could not load common proxy library." >&2
     return 1
@@ -210,6 +218,8 @@ fi
 1. **Autoloaded functions** (primary use case): When a function is autoloaded via `fpath`, `$0` contains just the function name (e.g., `qwen`), and `${0:A}` resolves to `$PWD/$0` (current working directory + function name), not the actual file path. The `functions_source` array from the `zsh/parameter` module provides the actual source file path, enabling reliable library loading regardless of the current working directory.
 
 2. **Direct execution and symlinks** (fallback): When the script is executed directly (e.g., `./autoload/qwen`) or via symlink, `$functions_source` is not set. The `${0:A:h}` expansion resolves the absolute path (following symlinks via `:A`), allowing the library to be found relative to the script location.
+
+3. **ZSH_FUNCTIONS_DIR fallback**: For non-standard environments (e.g., Claude Code) where both methods fail, set `export ZSH_FUNCTIONS_DIR="/path/to/zsh_functions"` in `~/.zshrc`.
 
 **Function Architecture Pattern:**
 Each function follows this structure:

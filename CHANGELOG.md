@@ -1,8 +1,24 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to this project will be documented in this file.
 
-### [1.0.1](https://github.com/cearley/zsh_functions/compare/v1.0.0...v1.0.1) (2025-12-17)
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- `ZSH_FUNCTIONS_DIR` environment variable fallback for library loading in non-standard environments (e.g., Claude Code)
+
+### Changed
+- Updated all proxy functions (codex, gemini, qwen, openspec) with three-tier library resolution
+- Improved documentation in README.md and CLAUDE.md
+
+## [1.0.1] - 2025-12-17
+
+### Changed
+- Updated release workflow to use ncipollo/release-action
+- Improved fpath syntax and autoload instructions in documentation
 
 ## [1.0.0] - 2025-12-17
 
@@ -30,3 +46,7 @@ All notable changes to this project will be documented in this file. See [standa
 ### Security
 - Added security notices for npm package installations
 - Improved input validation for user responses
+
+[Unreleased]: https://github.com/cearley/zsh_functions/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/cearley/zsh_functions/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/cearley/zsh_functions/releases/tag/v1.0.0

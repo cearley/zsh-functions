@@ -3,6 +3,11 @@
 # OpenSpec command proxy function.
 # Checks for @fission-ai/openspec package and installs if needed.
 # Acts as transparent proxy to the actual openspec command.
+#
+# Library resolution order:
+# 1. functions_source[$0] - works with normal autoload
+# 2. ${0:A:h} - works with direct execution or symlinks
+# 3. $ZSH_FUNCTIONS_DIR - set this env var for non-standard environments (e.g., Claude Code)
 
 # Load zsh/parameter module for functions_source array
 zmodload zsh/parameter 2>/dev/null
@@ -17,6 +22,11 @@ zmodload zsh/parameter 2>/dev/null
     # Fallback: try the original relative path (direct execution, symlinks)
     if [[ ! -v sourced ]]; then
         source "${0:A:h}/../lib/_common_proxy_lib" 2>/dev/null && sourced=1
+    fi
+
+    # Third fallback: use ZSH_FUNCTIONS_DIR environment variable
+    if [[ ! -v sourced && -n "$ZSH_FUNCTIONS_DIR" ]]; then
+        source "$ZSH_FUNCTIONS_DIR/lib/_common_proxy_lib" 2>/dev/null && sourced=1
     fi
 }
 
